@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Drought & Smart Irrigation Monitor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .layout {
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+
+        #map {
+            flex: 1 1 auto;
+            height: 100%;
+        }
+
+        .sidebar {
+            flex: 0 0 360px;
+            max-width: 420px;
+            padding: 16px 18px;
+            border-left: 1px solid #e0e0e0;
+            background: #fafafa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            margin-bottom: 12px;
+        }
+
+        .sidebar-header h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .sidebar-header span {
+            display: block;
+            margin-top: 4px;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .section {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px solid #e2e2e2;
+        }
+
+        .section-title {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #555;
+            margin-bottom: 4px;
+        }
+
+        .risk-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+        }
+
+        .risk-low {
+            background: #2ecc71;
+        }
+
+        .risk-medium {
+            background: #f1c40f;
+            color: #000;
+        }
+
+        .risk-high {
+            background: #e74c3c;
+        }
+
+        .value-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .value-row span:first-child {
+            color: #555;
+        }
+
+        .value-row span:last-child {
+            font-weight: 500;
+        }
+
+        .interpretation-text {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #333;
+            margin-top: 4px;
+        }
+
+        .hint {
+            font-size: 12px;
+            color: #777;
+            margin-top: 4px;
+        }
+
+        .provider {
+            margin-top: auto;
+            font-size: 11px;
+            color: #999;
+        }
+
+        .status {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .status.loading {
+            color: #555;
+        }
+
+        .status.error {
+            color: #c0392b;
+        }
+
+        .coords-text {
+            font-size: 13px;
+            color: #444;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 900px) {
+            .layout {
+                flex-direction: column;
+            }
+
+            #map {
+                height: 50%;
+            }
+
+            .sidebar {
+                flex: 0 0 auto;
+                height: 50%;
+                border-left: none;
+                border-top: 1px solid #e0e0e0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="layout">
+        <div id="map"></div>
+
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1>Drought & Smart Irrigation</h1>
+                <span>
+                    Click on the map to estimate drought risk and receive an automatic irrigation recommendation for the
+                    selected location.
+                </span>
+            </div>
+
+            <div id="status" class="status">
+                Waiting for a location…
+            </div>
+
+            <div class="section">
+                <div class="section-title">Location</div>
+                <div id="coords" class="coords-text">No point selected.</div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Drought risk</div>
+                <div id="risk-level-line">–</div>
+                <div id="risk-interpretation" class="interpretation-text"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">30-day water balance</div>
+                <div id="history-values"></div>
+                <div class="hint">
+                    Water balance = precipitation − reference evapotranspiration (ET₀).
+                    Negative values indicate a moisture deficit.
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">7-day forecast</div>
+                <div id="forecast-values"></div>
+                <div class="hint">
+                    High temperatures combined with very low forecast rainfall increase
+                    short-term drought risk.
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">Irrigation recommendation</div>
+                <div id="irrigation-values"></div>
+                <div id="irrigation-interpretation" class="interpretation-text"></div>
+
+            </div>
+
+            <div class="provider">
+                Data source: Open-Meteo (free API, no key required).<br />
+                Logic: Drought module + smart irrigation module combined in <code>smartIrrigation.js</code>.
+            </div>
+        </aside>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <!-- Frontend glue: use smartIrrigation.js to combine drought + irrigation -->
+    <script type="module">
+        import { getSmartIrrigationPlanForField } from './smartIrrigation.js';
+
+        // --------- Helpers ---------
+
+        const statusEl = document.getElementById('status');
+        const coordsEl = document.getElementById('coords');
+        const riskLevelEl = document.getElementById('risk-level-line');
+        const riskInterpretationEl = document.getElementById('risk-interpretation');
+        const historyValuesEl = document.getElementById('history-values');
+        const forecastValuesEl = document.getElementById('forecast-values');
+        const irrigationValuesEl = document.getElementById('irrigation-values');
+        const irrigationInterpEl = document.getElementById('irrigation-interpretation');
+
+        function setStatus(text, type = 'info') {
+            statusEl.textContent = text;
+            statusEl.className = 'status ' + (
+                type === 'error' ? 'error' :
+                    type === 'loading' ? 'loading' : ''
+            );
+        }
+
+        function formatNumber(value, digits = 1) {
+            if (value === undefined || value === null || isNaN(value)) return '–';
+            return Number(value).toFixed(digits);
+        }
+
+        function riskClass(level) {
+            if (level === 'low') return 'risk-low';
+            if (level === 'medium') return 'risk-medium';
+            return 'risk-high';
+        }
+
+        function markerColor(level) {
+            switch (level) {
+                case 'low': return '#2ecc71';
+                case 'medium': return '#f1c40f';
+                case 'high':
+                default: return '#e74c3c';
+            }
+        }
+
+        // Convert a map click into a "field" object.
+        // Frontend can later plug in real field IDs, crop, growth stage, soil moisture.
+        function buildFieldFromClick(lat, lon) {
+            return {
+                id: null,
+                lat,
+                lon,
+                crop: 'cotton',
+                growthStage: 'vegetative',
+                soilMoisture: null
+            };
+        }
+
+        function updateSidebarFromPlan(plan) {
+            const { location, drought, irrigation } = plan;
+            const { level, indicators } = drought;
+            const { P30, ET30, waterBalance, forecastPrecip, forecastTmax } = indicators;
+
+            coordsEl.textContent = `Latitude: ${location.lat.toFixed(3)}, Longitude: ${location.lon.toFixed(3)}`;
+
+            const pillClass = riskClass(level);
+            const label = level.toUpperCase();
+
+            riskLevelEl.innerHTML = `<span class="risk-pill ${pillClass}">${label}</span>`;
+            riskInterpretationEl.textContent =
+                'Drought level is derived from 30-day water balance and a 7-day hot/dry outlook.';
+
+            historyValuesEl.innerHTML = `
+      <div class="value-row">
+        <span>Water balance (30 days)</span>
+        <span>${formatNumber(waterBalance)} mm</span>
+      </div>
+      <div class="value-row">
+        <span>Precipitation (30 days)</span>
+        <span>${formatNumber(P30)} mm</span>
+      </div>
+      <div class="value-row">
+        <span>ET₀ (30 days)</span>
+        <span>${formatNumber(ET30)} mm</span>
+      </div>
+    `;
+
+            forecastValuesEl.innerHTML = `
+      <div class="value-row">
+        <span>Total precipitation (7 days)</span>
+        <span>${formatNumber(forecastPrecip)} mm</span>
+      </div>
+      <div class="value-row">
+        <span>Max temperature (7 days)</span>
+        <span>${formatNumber(forecastTmax)} °C</span>
+      </div>
+    `;
+
+            const { recommended_mm, recommended_minutes, priority, explanation } = irrigation;
+
+            irrigationValuesEl.innerHTML = `
+      <div class="value-row">
+        <span>Recommended dose</span>
+        <span>${recommended_mm} mm</span>
+      </div>
+      <div class="value-row">
+        <span>Estimated duration</span>
+        <span>${recommended_minutes} min</span>
+      </div>
+      <div class="value-row">
+        <span>Irrigation priority</span>
+        <span>${formatNumber(priority, 2)}</span>
+      </div>
+    `;
+
+            irrigationInterpEl.textContent =
+                `For ${explanation.crop} at ${explanation.growthStage} stage, ` +
+                `under current drought conditions (${explanation.droughtLevel.toUpperCase()}), ` +
+                `this location should receive ${recommended_mm} mm of water ` +
+                `(approximately ${recommended_minutes} minutes with the current system).`;
+
+            setStatus('Drought and irrigation plan updated for the selected location.');
+        }
+
+        // --------- Map setup ---------
+
+        const INITIAL_CENTER = [43.0, 69.0]; // generic center; frontend can change
+        const INITIAL_ZOOM = 5;
+
+        const map = L.map('map').setView(INITIAL_CENTER, INITIAL_ZOOM);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 12,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        const markerLayer = L.layerGroup().addTo(map);
+
+        async function handleMapClick(lat, lon) {
+            setStatus('Calculating drought risk and irrigation plan…', 'loading');
+
+            const field = buildFieldFromClick(lat, lon);
+
+            try {
+                const plan = await getSmartIrrigationPlanForField(field);
+
+                markerLayer.clearLayers();
+
+                const level = plan.drought.level;
+                const color = markerColor(level);
+                const { indicators } = plan.drought;
+                const { waterBalance, forecastPrecip, forecastTmax } = indicators;
+                const { recommended_minutes } = plan.irrigation;
+
+                const marker = L.circleMarker([lat, lon], {
+                    radius: 8,
+                    weight: 2,
+                    color,
+                    fillColor: color,
+                    fillOpacity: 0.9
+                }).addTo(markerLayer);
+
+                marker.bindPopup(
+                    `<strong>Drought: ${level.toUpperCase()}</strong><br>` +
+                    `Water balance (30d): ${formatNumber(waterBalance)} mm<br>` +
+                    `Next 7d rain: ${formatNumber(forecastPrecip)} mm<br>` +
+                    `Irrigation: ${recommended_minutes} min`
+                ).openPopup();
+
+                updateSidebarFromPlan(plan);
+            } catch (err) {
+                console.error(err);
+                setStatus(err.message || 'Failed to load plan', 'error');
+            }
+        }
+
+        map.on('click', (e) => {
+            const { lat, lng } = e.latlng;
+            handleMapClick(lat, lng);
+        });
+
+        // Optional: initial analysis at a default point
+        handleMapClick(INITIAL_CENTER[0], INITIAL_CENTER[1]);
+    </script>
+
+</body>
+
+</html>
