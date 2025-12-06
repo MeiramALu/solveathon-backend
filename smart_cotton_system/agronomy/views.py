@@ -2,12 +2,12 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from .models import Field, SensorLog, SeedVariety
 from .serializers import FieldSerializer, SensorLogSerializer, SeedVarietySerializer
-from users.permissions import IsFarmer
+from users.permissions import IsFarmer  # Импортируем, если нужно проверять роль
 
 
 class SeedVarietyViewSet(viewsets.ModelViewSet):
     """
-    Справочник семян. Обычно фермеры его только читают.
+    Справочник семян.
     """
     queryset = SeedVariety.objects.all()
     serializer_class = SeedVarietySerializer
@@ -16,39 +16,40 @@ class SeedVarietyViewSet(viewsets.ModelViewSet):
 
 class FieldViewSet(viewsets.ModelViewSet):
     """
-    Поля. Здесь главная логика разделения.
+    Поля. Фильтрация: Фермер видит только свои поля.
     """
     serializer_class = FieldSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """
-        Магия разделения данных:
-        1. Получаем текущего пользователя (request.user).
-        2. Если он Фермер -> возвращаем только поля, где owner = он сам.
-        3. Если он Админ или Лаборант -> возвращаем всё.
-        """
         user = self.request.user
-
-        # Проверяем роль (если у пользователя есть атрибут role)
+        # Если Фермер -> возвращаем только его поля
         if hasattr(user, 'role') and user.role == 'FARMER':
             return Field.objects.filter(owner=user)
-
-        # Для всех остальных (админов, менеджеров) показываем всё
+        # Если Админ/Лаборант -> возвращаем всё
         return Field.objects.all()
 
     def perform_create(self, serializer):
-        """
-        При создании поля автоматически прописываем владельца.
-        Фермеру не нужно выбирать себя из списка, система сама подставит его ID.
-        """
+        # При создании поля авто-владелец
         serializer.save(owner=self.request.user)
 
 
 class SensorLogViewSet(viewsets.ModelViewSet):
     """
     Логи датчиков.
+    Здесь тоже добавляем фильтрацию, чтобы фермер видел логи ТОЛЬКО со своих полей.
     """
-    queryset = SensorLog.objects.all().order_by('-timestamp')
     serializer_class = SensorLogSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Берем базовый запрос
+        queryset = SensorLog.objects.all().order_by('-timestamp')
+
+        user = self.request.user
+
+        # Если Фермер -> фильтруем логи через поле (field__owner)
+        if hasattr(user, 'role') and user.role == 'FARMER':
+            return queryset.filter(field__owner=user)
+
+        return queryset

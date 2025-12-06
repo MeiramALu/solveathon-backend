@@ -1,17 +1,17 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from .models import SensorLog
-from .services import predict_irrigation_need
+from .services import analyze_water_needs
 
 
-@receiver(post_save, sender=SensorLog)
-def check_soil_status(sender, instance, created, **kwargs):
-    if created:
-        print(f"💧 Water AI: Анализ влажности {instance.soil_moisture}%...")
+@receiver(pre_save, sender=SensorLog)
+def run_water_ai(sender, instance, **kwargs):
+    """
+    Перед сохранением записи запускаем анализ.
+    """
+    # Вызываем нашу функцию
+    need_water, message = analyze_water_needs(instance.soil_moisture, instance.weather_temp)
 
-        should_irrigate = predict_irrigation_need(instance.soil_moisture, instance.weather_temp)
-
-        if should_irrigate:
-            instance.irrigation_needed = True
-            instance.save(update_fields=['irrigation_needed'])
-            print(f"⚠️ РЕКОМЕНДАЦИЯ: Включить полив на поле {instance.field.name}!")
+    # Записываем результат в базу
+    instance.irrigation_needed = need_water
+    instance.ml_message = message

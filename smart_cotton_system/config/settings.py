@@ -30,7 +30,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
     'corsheaders',
+    'drf_yasg',
+    'djoser',
 
     'users.apps.UsersConfig',
     'agronomy.apps.AgronomyConfig',
@@ -133,3 +136,20 @@ CORS_ALLOW_CREDENTIALS = True
 
 ML_API_URL = os.getenv('EXTERNAL_ML_URL')
 ML_API_KEY = os.getenv('EXTERNAL_ML_KEY')
+
+ROBOFLOW_API_KEY = os.getenv('ROBOFLOW_API_KEY')
+ROBOFLOW_MODEL_ID = os.getenv('ROBOFLOW_MODEL_ID')
+ROBOFLOW_VERSION = os.getenv('ROBOFLOW_VERSION')
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        # Это нужно для скриптов и мобильных приложений (вход по токену)
+        'rest_framework.authentication.TokenAuthentication',
+
+        # Это нужно для Админки и Swagger (вход через браузер)
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ]
+}

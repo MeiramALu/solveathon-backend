@@ -1,27 +1,21 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from .models import CottonBatch
-from .services import send_image_to_ml_api
+from .services import classify_cotton_quality  # <-- ИСПРАВЛЕННЫЙ ИМПОРТ
 
 
-@receiver(post_save, sender=CottonBatch)
-def analyze_cotton_on_save(sender, instance, created, **kwargs):
+@receiver(pre_save, sender=CottonBatch)
+def run_quality_analysis(sender, instance, **kwargs):
     """
-    Срабатывает после сохранения партии.
+    Автоматически вычисляет класс хлопка перед сохранением,
+    если введены показатели HVI.
     """
-    # Если это новая запись и есть картинка
-    if created and instance.cotton_image:
+    # Если введены ключевые показатели, запускаем расчет
+    if instance.micronaire and instance.strength:
 
-        # 1. Отправляем во внешний сервис
-        ml_result = send_image_to_ml_api(instance.cotton_image.path)
+        predicted_class = classify_cotton_quality(instance)
 
-        if ml_result:
-            # 2. Парсим ответ (структура зависит от вашего ML API!)
-            # Пример: API вернуло {"class": "Supreme", "len": 28.5}
-
-            instance.grade = ml_result.get('class', 'Unknown')
-            instance.fiber_length = ml_result.get('len', 0)
-            instance.trash_content = ml_result.get('trash', 0)
-
-            # 3. Сохраняем ТОЛЬКО обновленные поля (чтобы не зациклить сигнал)
-            instance.save(update_fields=['grade', 'fiber_length', 'trash_content'])
+        if predicted_class:
+            instance.quality_class = predicted_class
+            instance.status = 'ANALYZED'
+            print(f"🤖 AI Analysis: Партия {instance.batch_code} -> {predicted_class}")

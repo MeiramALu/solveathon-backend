@@ -4,11 +4,14 @@ from .views import FieldViewSet, SensorLogViewSet, SeedVarietyViewSet
 
 router = DefaultRouter()
 
-# --- ВНИМАНИЕ: Добавляем basename='field' ---
-# Это обязательно, потому что в FieldViewSet мы используем get_queryset() вместо queryset
+# Мы уже добавили basename для полей
 router.register(r'fields', FieldViewSet, basename='field')
 
-router.register(r'sensors', SensorLogViewSet)
+# --- ИСПРАВЛЕНИЕ: Добавляем basename='sensorlog' ---
+# Это решит вашу текущую ошибку
+router.register(r'sensors', SensorLogViewSet, basename='sensorlog')
+
+# Для семян basename не нужен, так как там остался стандартный queryset
 router.register(r'seeds', SeedVarietyViewSet)
 
 urlpatterns = [
