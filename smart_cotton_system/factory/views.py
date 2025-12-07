@@ -1,26 +1,60 @@
 from rest_framework import viewsets, status
-from rest_framework.decorators import action  # <-- Этого не хватало
-from rest_framework.response import Response  # <-- Этого не хватало
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-
+import google.generativeai as genai
+from django.conf import settings
 from .models import CottonBatch, Machine, MaintenanceLog
 from .serializers import CottonBatchSerializer, MachineSerializer, MaintenanceLogSerializer
-from users.permissions import IsLabOrReadOnly
 from .services import analyze_machine_health
 
 class CottonBatchViewSet(viewsets.ModelViewSet):
-    """
-    Управление партиями хлопка.
-    - Смотреть список могут все авторизованные пользователи.
-    - Создавать/Редактировать (вносить HVI данные) могут только Лаборанты (LAB).
-    """
     queryset = CottonBatch.objects.all().order_by('-created_at')
     serializer_class = CottonBatchSerializer
-    permission_classes = [IsAuthenticated, IsLabOrReadOnly]
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save()
 
+
+    @action(detail=False, methods=['post'])
+    def ai_assistant(self, request):
+        """
+        Умный AI-консультант на базе Google Gemini.
+        """
+        user_msg = request.data.get('message', '')
+
+        if not user_msg:
+            return Response({"bot_answer": "Пожалуйста, напишите вопрос."})
+
+        try:
+            # 1. Настройка Gemini
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            model = genai.GenerativeModel('gemini-2.5-flash')  # Используем быструю модель
+
+            # 2. Инструкция для ИИ (Роль)
+            # Мы объясняем боту, кто он такой, чтобы он не говорил глупостей.
+            system_prompt = (
+                "Ты — умный ассистент платформы 'Smart Cotton System'. "
+                "Твоя цель — помогать фермерам и технологам завода. "
+                "Ты эксперт в агрономии хлопка, ценах на биржах, погоде и вредителях. "
+                "Отвечай кратко, профессионально, но дружелюбно. "
+                "Если спрашивают о системе, говори, что мы используем компьютерное зрение и IoT датчики. "
+                "Вопрос пользователя: "
+            )
+
+            # 3. Генерация ответа
+            response = model.generate_content(system_prompt + user_msg)
+
+            # Получаем текст
+            answer = response.text
+
+        except Exception as e:
+            # Если ключ неверный или нет интернета, вернем заглушку
+            print(f"❌ Ошибка Gemini: {e}")
+            answer = "Извините, сейчас связь с нейросетью недоступна. Попробуйте позже."
+
+        return Response({"bot_answer": answer})
 
 class MachineViewSet(viewsets.ModelViewSet):
     queryset = Machine.objects.all()
