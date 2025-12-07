@@ -1,0 +1,42 @@
+arima: mae=0.26864 rmse=0.28889 mape=0.51764 r2=-5.93290
+auto_arima: mae=0.28653 rmse=0.30401 mape=0.55217 r2=-6.67777
+--- Iteration #1 ---
+lstm: mae=0.45408 rmse=0.46920 mape=0.87524 r2=-17.28833
+blstm: mae=0.20599 rmse=0.31184 mape=0.39800 r2=-7.07850
+transformer: mae=4.08149 rmse=4.08297 mape=7.87071 r2=-1383.88553
+--- Iteration #2 ---
+lstm: mae=0.30231 rmse=0.31781 mape=0.58728 r2=-7.39080
+blstm: mae=0.26132 rmse=0.28058 mape=0.51026 r2=-5.53992
+transformer: mae=4.18346 rmse=4.18490 mape=8.06735 r2=-1453.89573
+--- Iteration #3 ---
+lstm: mae=0.42126 rmse=0.55678 mape=0.82470 r2=-24.75287
+blstm: mae=0.16378 rmse=0.17666 mape=0.28585 r2=-1.59273
+transformer: mae=4.17040 rmse=4.17184 mape=8.04216 r2=-1444.83125
+--- Iteration #4 ---
+lstm: mae=0.22162 rmse=0.24629 mape=0.43755 r2=-4.03897
+blstm: mae=0.50777 rmse=0.52779 mape=0.97907 r2=-22.14120
+transformer: mae=4.15391 rmse=4.15535 mape=8.01035 r2=-1433.42467
+--- Iteration #5 ---
+lstm: mae=0.16163 rmse=0.21712 mape=0.25730 r2=-2.91621
+blstm: mae=0.18000 rmse=0.25455 mape=0.31368 r2=-4.38271
+transformer: mae=4.16302 rmse=4.16447 mape=8.02794 r2=-1439.72383
+--- Iteration #6 ---
+lstm: mae=0.47136 rmse=0.48733 mape=0.90858 r2=-18.72894
+blstm: mae=0.42712 rmse=0.44315 mape=0.82529 r2=-15.31378
+transformer: mae=4.18877 rmse=4.19020 mape=8.07759 r2=-1457.58627
+--- Iteration #7 ---
+lstm: mae=0.17726 rmse=0.18916 mape=0.32718 r2=-1.97234
+blstm: mae=0.67952 rmse=0.85956 mape=1.31143 r2=-60.37878
+transformer: mae=4.16091 rmse=4.16236 mape=8.02387 r2=-1438.26510
+--- Iteration #8 ---
+lstm: mae=0.50775 rmse=0.52690 mape=0.97874 r2=-22.06356
+blstm: mae=0.43634 rmse=0.56620 mape=0.84621 r2=-25.63153
+transformer: mae=4.20989 rmse=4.21132 mape=8.11833 r2=-1472.32584
+--- Iteration #9 ---
+lstm: mae=0.29954 rmse=0.43259 mape=0.59858 r2=-14.54552
+blstm: mae=1.08493 rmse=1.14693 mape=2.09184 r2=-108.27779
+transformer: mae=4.15150 rmse=4.15295 mape=8.00571 r2=-1431.76389
+--- Iteration #10 ---
+lstm: mae=0.14751 rmse=0.17994 mape=0.21500 r2=-1.68969
+blstm: mae=0.63747 rmse=0.66206 mape=1.22891 r2=-35.41258
+transformer: mae=4.11244 rmse=4.11391 mape=7.93039 r2=-1404.95221

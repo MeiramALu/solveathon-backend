@@ -1,0 +1,8 @@
+from django.apps import AppConfig
+
+class AgronomyConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'agronomy'
+
+    def ready(self):
+        import agronomy.signals

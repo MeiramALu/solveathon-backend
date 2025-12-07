@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Turkistan Cotton Routes (ORS)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .app {
+            display: flex;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 360px;
+            max-width: 100%;
+            padding: 12px;
+            box-sizing: border-box;
+            border-right: 1px solid #ddd;
+            overflow-y: auto;
+            background: #fafafa;
+        }
+
+        #map {
+            flex: 1;
+        }
+
+        h1 {
+            font-size: 20px;
+            margin: 0 0 8px;
+        }
+
+        h2 {
+            font-size: 16px;
+            margin: 16px 0 8px;
+        }
+
+        h3 {
+            font-size: 14px;
+            margin: 12px 0 6px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        input[type="number"],
+        input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 4px 6px;
+            margin-top: 4px;
+            font-size: 13px;
+        }
+
+        button {
+            padding: 6px 8px;
+            border-radius: 4px;
+            border: 1px solid #333;
+            background: #333;
+            color: #fff;
+            cursor: pointer;
+            font-size: 13px;
+            margin-right: 6px;
+            margin-top: 6px;
+        }
+
+        button.secondary {
+            background: #fff;
+            color: #333;
+        }
+
+        button.small {
+            padding: 3px 6px;
+            font-size: 12px;
+            margin-top: 0;
+            margin-right: 0;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: default;
+        }
+
+        small {
+            display: block;
+            color: #555;
+            margin-bottom: 4px;
+            font-size: 12px;
+        }
+
+        .route-card {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px 8px;
+            margin-top: 8px;
+            font-size: 13px;
+            background: #fff;
+        }
+
+        .route-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid #222;
+            flex-shrink: 0;
+        }
+
+        .routes-container {
+            margin-top: 6px;
+        }
+
+        .vehicle-row {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 6px 8px;
+            margin-bottom: 8px;
+            background: #fff;
+        }
+
+        .vehicle-row-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+
+        .vehicle-row-header-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .field-item {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 4px 6px;
+            margin-bottom: 4px;
+            background: #fff;
+            font-size: 12px;
+        }
+
+        .field-item-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 4px;
+        }
+
+        .field-item-header span {
+            font-weight: 600;
+        }
+
+        .field-row-inputs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px;
+        }
+
+        .error-panel {
+            border: 1px solid #e63946;
+            background: #ffe5e9;
+            color: #61111b;
+            border-radius: 6px;
+            padding: 6px 8px;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+
+        .error-panel-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app">
+        <div class="sidebar">
+            <h1>Turkistan Cotton Routes (ORS)</h1>
+            <small>
+                Drag the depot marker to change base. Click the map to add fields using defaults below.
+            </small>
+
+            <h2>Depot</h2>
+            <div id="depotInfo" style="font-size: 12px; margin-bottom: 6px;"></div>
+            <small>Depot marker on the map is draggable.</small>
+
+            <h2>Fields</h2>
+            <label>
+                Default field yield (tons)
+                <input id="defaultDemandInput" type="number" min="1" value="5" />
+            </label>
+            <label>
+                Default service time (minutes)
+                <input id="defaultServiceInput" type="number" min="1" value="15" />
+            </label>
+            <small>Click on the map to add a field at that location. Then edit yield & time per field below.</small>
+
+            <h3>Field list</h3>
+            <div id="fieldsList"></div>
+
+            <h2>Vehicles</h2>
+            <small>Configure each vehicle separately (capacity & shift). Colors match map routes.</small>
+            <div id="vehiclesContainer"></div>
+            <button id="addVehicleBtn" type="button" class="secondary">+ Add vehicle</button>
+
+            <h2>Assumptions</h2>
+            <label>
+                Average travel speed (km/h, for baseline comparison)
+                <input id="avgSpeedInput" type="number" min="1" value="40" />
+            </label>
+
+            <h2>Run optimization</h2>
+            <button id="optimizeBtn">Optimize routes</button>
+            <button id="clearFieldsBtn" type="button" class="secondary">Clear fields</button>
+
+            <div id="metrics"></div>
+            <div id="ai-insights"></div>
+        </div>
+
+        <div id="map"></div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Polyline decoder -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mapbox-polyline/1.2.1/polyline.min.js"></script>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:4000';
+
+        // Depot near Turkistan (~43.2973 N, 68.2517 E)
+        const depot = {
+            lat: 43.2973,
+            lon: 68.2517
+        };
+
+        // Colors assigned to vehicles
+        const palette = ['#e63946', '#457b9d', '#2a9d8f', '#ffba08', '#6a4c93', '#f4a261', '#1d3557', '#06d6a0'];
+
+        // --- State ---
+        let fields = [];
+        let nextFieldId = 1;
+        let vehicles = [];
+        let nextVehicleId = 1;
+        let routeLayers = [];
+        const vehicleColors = {};
+
+        // --- DOM refs ---
+        const depotInfoEl = document.getElementById('depotInfo');
+        const defaultDemandInput = document.getElementById('defaultDemandInput');
+        const defaultServiceInput = document.getElementById('defaultServiceInput');
+        const avgSpeedInput = document.getElementById('avgSpeedInput');
+        const fieldsListEl = document.getElementById('fieldsList');
+        const vehiclesContainerEl = document.getElementById('vehiclesContainer');
+        const addVehicleBtn = document.getElementById('addVehicleBtn');
+        const optimizeBtn = document.getElementById('optimizeBtn');
+        const clearFieldsBtn = document.getElementById('clearFieldsBtn');
+        const metricsEl = document.getElementById('metrics');
+        const aiInsightsEl = document.getElementById('ai-insights');
+
+        // --- Map ---
+        const map = L.map('map').setView([depot.lat, depot.lon], 11);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        const depotMarker = L.marker([depot.lat, depot.lon], { draggable: true })
+            .addTo(map)
+            .bindPopup('Depot / Cotton gin');
+
+        depotMarker.on('dragend', () => {
+            const { lat, lng } = depotMarker.getLatLng();
+            depot.lat = lat;
+            depot.lon = lng;
+            updateDepotInfo();
+        });
+
+        updateDepotInfo();
+
+        function updateDepotInfo() {
+            depotInfoEl.textContent = `Lat: ${depot.lat.toFixed(5)}, Lon: ${depot.lon.toFixed(5)}`;
+        }
+
+        // --- Haversine helper (for baseline estimation) ---
+        function haversineKm(lon1, lat1, lon2, lat2) {
+            const R = 6371; // km
+            const toRad = (d) => (d * Math.PI) / 180;
+
+            const φ1 = toRad(lat1);
+            const φ2 = toRad(lat2);
+            const Δφ = toRad(lat2 - lat1);
+            const Δλ = toRad(lon2 - lon1);
+
+            const a =
+                Math.sin(Δφ / 2) ** 2 +
+                Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) ** 2;
+
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
+        // --- Fields UI ---
+        function updateFieldsList() {
+            fieldsListEl.innerHTML = '';
+            if (!fields.length) {
+                fieldsListEl.innerHTML = '<small>No fields yet. Click the map to add.</small>';
+                return;
+            }
+
+            fields.forEach((f) => {
+                const container = document.createElement('div');
+                container.className = 'field-item';
+
+                const header = document.createElement('div');
+                header.className = 'field-item-header';
+
+                const title = document.createElement('span');
+                title.textContent = `Field #${f.id}`;
+                header.appendChild(title);
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'small secondary';
+                removeBtn.textContent = '✕';
+                removeBtn.title = 'Remove field';
+                removeBtn.onclick = () => removeField(f.id);
+                header.appendChild(removeBtn);
+
+                container.appendChild(header);
+
+                const coords = document.createElement('div');
+                coords.style.fontSize = '11px';
+                coords.style.marginBottom = '4px';
+                coords.textContent = `Lat: ${f.lat.toFixed(4)}, Lon: ${f.lon.toFixed(4)}`;
+                container.appendChild(coords);
+
+                const inputs = document.createElement('div');
+                inputs.className = 'field-row-inputs';
+
+                const demandLabel = document.createElement('label');
+                demandLabel.style.marginBottom = '0';
+                demandLabel.textContent = 'Yield (tons)';
+                const demandInput = document.createElement('input');
+                demandInput.type = 'number';
+                demandInput.min = '0';
+                demandInput.value = f.demand.toString();
+                demandInput.oninput = () => {
+                    const v = Number(demandInput.value);
+                    f.demand = Number.isNaN(v) ? 0 : v;
+                };
+                demandLabel.appendChild(demandInput);
+
+                const serviceLabel = document.createElement('label');
+                serviceLabel.style.marginBottom = '0';
+                serviceLabel.textContent = 'Service (min)';
+                const serviceInput = document.createElement('input');
+                serviceInput.type = 'number';
+                serviceInput.min = '0';
+                serviceInput.value = f.serviceTimeMinutes.toString();
+                serviceInput.oninput = () => {
+                    const v = Number(serviceInput.value);
+                    f.serviceTimeMinutes = Number.isNaN(v) ? 0 : v;
+                };
+                serviceLabel.appendChild(serviceInput);
+
+                inputs.appendChild(demandLabel);
+                inputs.appendChild(serviceLabel);
+                container.appendChild(inputs);
+
+                fieldsListEl.appendChild(container);
+            });
+        }
+
+        function removeField(id) {
+            const idx = fields.findIndex((f) => f.id === id);
+            if (idx === -1) return;
+
+            const field = fields[idx];
+            if (field.marker) {
+                map.removeLayer(field.marker);
+            }
+            fields.splice(idx, 1);
+            updateFieldsList();
+        }
+
+        function clearRoutes() {
+            routeLayers.forEach((layer) => map.removeLayer(layer));
+            routeLayers = [];
+
+            // Reset marker colors
+            fields.forEach((f) => {
+                if (f.marker) {
+                    f.marker.setStyle({
+                        color: '#2c7be5',
+                        fillColor: '#2c7be5'
+                    });
+                }
+            });
+        }
+
+        // Add field by clicking the map, using sidebar defaults
+        map.on('click', (e) => {
+            const demand = Number(defaultDemandInput.value) || 5;
+            const serviceMinutes = Number(defaultServiceInput.value) || 15;
+
+            const field = {
+                id: nextFieldId++,
+                lat: e.latlng.lat,
+                lon: e.latlng.lng,
+                demand,
+                serviceTimeMinutes: serviceMinutes
+            };
+
+            const marker = L.circleMarker(e.latlng, {
+                radius: 6,
+                color: '#2c7be5',
+                fillColor: '#2c7be5',
+                fillOpacity: 0.9
+            }).addTo(map);
+
+            marker.bindPopup(
+                `Field #${field.id}<br>` +
+                `Yield: ${field.demand.toFixed(1)} t<br>` +
+                `Service: ${field.serviceTimeMinutes.toFixed(1)} min`
+            );
+
+            field.marker = marker;
+            fields.push(field);
+            updateFieldsList();
+        });
+
+        clearFieldsBtn.addEventListener('click', () => {
+            fields.forEach((f) => {
+                if (f.marker) map.removeLayer(f.marker);
+            });
+            fields = [];
+            nextFieldId = 1;
+            clearRoutes();
+            updateFieldsList();
+            metricsEl.innerHTML = '';
+        });
+
+        // --- Vehicles UI ---
+        function addVehicle(initial = {}) {
+            const id = nextVehicleId++;
+            const color = palette[(id - 1) % palette.length];
+
+            const vehicle = {
+                id,
+                name: initial.name || `Vehicle ${id}`,
+                capacity: initial.capacity || 20,
+                shiftMinutes: initial.shiftMinutes || 480, // 8h
+                color
+            };
+            vehicles.push(vehicle);
+            vehicleColors[id] = color;
+            renderVehicles();
+        }
+
+        function removeVehicle(id) {
+            if (vehicles.length <= 1) {
+                alert('You need at least one vehicle.');
+                return;
+            }
+            const idx = vehicles.findIndex((v) => v.id === id);
+            if (idx === -1) return;
+            vehicles.splice(idx, 1);
+            delete vehicleColors[id];
+            renderVehicles();
+        }
+
+        function renderVehicles() {
+            vehiclesContainerEl.innerHTML = '';
+            if (!vehicles.length) {
+                vehiclesContainerEl.innerHTML = '<small>No vehicles yet.</small>';
+                return;
+            }
+
+            vehicles.forEach((v) => {
+                const row = document.createElement('div');
+                row.className = 'vehicle-row';
+
+                const header = document.createElement('div');
+                header.className = 'vehicle-row-header';
+
+                const headerLeft = document.createElement('div');
+                headerLeft.className = 'vehicle-row-header-left';
+
+                const dot = document.createElement('div');
+                dot.className = 'color-dot';
+                dot.style.backgroundColor = v.color;
+                headerLeft.appendChild(dot);
+
+                const title = document.createElement('span');
+                title.style.fontSize = '13px';
+                title.textContent = v.name;
+                headerLeft.appendChild(title);
+
+                header.appendChild(headerLeft);
+
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'small secondary';
+                removeBtn.textContent = '✕';
+                removeBtn.title = 'Remove vehicle';
+                removeBtn.onclick = () => removeVehicle(v.id);
+                header.appendChild(removeBtn);
+
+                row.appendChild(header);
+
+                // Editable inputs
+                const nameLabel = document.createElement('label');
+                nameLabel.style.marginBottom = '4px';
+                nameLabel.textContent = 'Name';
+                const nameInput = document.createElement('input');
+                nameInput.type = 'text';
+                nameInput.value = v.name;
+                nameInput.oninput = () => {
+                    v.name = nameInput.value || `Vehicle ${v.id}`;
+                    renderVehicles();
+                };
+                nameLabel.appendChild(nameInput);
+                row.appendChild(nameLabel);
+
+                const capLabel = document.createElement('label');
+                capLabel.style.marginBottom = '4px';
+                capLabel.textContent = 'Capacity (tons / units)';
+                const capInput = document.createElement('input');
+                capInput.type = 'number';
+                capInput.min = '1';
+                capInput.value = v.capacity;
+                capInput.oninput = () => {
+                    v.capacity = Number(capInput.value) || 1;
+                };
+                capLabel.appendChild(capInput);
+                row.appendChild(capLabel);
+
+                const shiftLabel = document.createElement('label');
+                shiftLabel.style.marginBottom = '0';
+                shiftLabel.textContent = 'Shift length (minutes)';
+                const shiftInput = document.createElement('input');
+                shiftInput.type = 'number';
+                shiftInput.min = '0';
+                shiftInput.value = v.shiftMinutes;
+                shiftInput.oninput = () => {
+                    v.shiftMinutes = Number(shiftInput.value) || 0;
+                };
+                shiftLabel.appendChild(shiftInput);
+                row.appendChild(shiftLabel);
+
+                vehiclesContainerEl.appendChild(row);
+            });
+        }
+
+        addVehicleBtn.addEventListener('click', () => addVehicle());
+
+        // Start with 2 vehicles by default
+        addVehicle({ name: 'Harvester 1', capacity: 20, shiftMinutes: 480 });
+        addVehicle({ name: 'Harvester 2', capacity: 20, shiftMinutes: 480 });
+
+        // --- Error / info panel helper ---
+        function showErrorPanel(title, messages) {
+            const listHtml = (Array.isArray(messages) ? messages : [messages])
+                .map((m) => `<li>${m}</li>`)
+                .join('');
+            metricsEl.innerHTML = `
+        <div class="error-panel">
+          <div class="error-panel-title">${title}</div>
+          <ul>${listHtml}</ul>
+        </div>
+      `;
+        }
+
+        // --- Optimize button ---
+        optimizeBtn.addEventListener('click', async () => {
+            if (!fields.length) {
+                alert('Add at least one field by clicking on the map.');
+                return;
+            }
+            if (!vehicles.length) {
+                alert('Add at least one vehicle.');
+                return;
+            }
+
+            clearRoutes();
+            metricsEl.innerHTML = '';
+
+            const payload = {
+                depot,
+                vehicles: vehicles.map((v) => ({
+                    id: v.id,
+                    name: v.name,
+                    capacity: v.capacity,
+                    shiftMinutes: v.shiftMinutes
+                })),
+                fields: fields.map(({ id, lat, lon, demand, serviceTimeMinutes }) => ({
+                    id,
+                    lat,
+                    lon,
+                    demand,
+                    serviceTimeMinutes
+                }))
+            };
+
+            try {
+                optimizeBtn.disabled = true;
+                optimizeBtn.textContent = 'Optimizing...';
+
+                const resp = await fetch(`${API_BASE_URL}/optimize`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await resp.json().catch(() => null);
+
+                if (!resp.ok) {
+                    if (data && data.errorType === 'FEASIBILITY') {
+                        const errs = (data.details && data.details.errors) || [data.error];
+                        showErrorPanel('Scenario not feasible', errs);
+                        return;
+                    }
+
+                    if (data && data.errorType === 'ORS') {
+                        const ors = data.orsError || {};
+                        const msg =
+                            (ors.error && ors.error.message) ||
+                            JSON.stringify(ors) ||
+                            data.error;
+                        showErrorPanel('Routing / map issue', [
+                            msg,
+                            'Tip: check that depot and all fields are close enough to a mapped road. Try moving points closer to visible roads.'
+                        ]);
+
+                        // Try to highlight suspicious coordinate if ORS gave one
+                        tryHighlightBadCoordinate(msg);
+                        return;
+                    }
+
+                    const msg = (data && data.error) || resp.statusText;
+                    showErrorPanel('Unexpected error', [msg]);
+                    return;
+                }
+
+                renderSolution(data.orsSolution || {});
+            } catch (err) {
+                console.error(err);
+                showErrorPanel('Optimization failed', [err.message]);
+            } finally {
+                optimizeBtn.disabled = false;
+                optimizeBtn.textContent = 'Optimize routes';
+            }
+        });
+
+        function tryHighlightBadCoordinate(message) {
+            // ORS often says: "Could not find routable point ... of specified coordinate 68.25,43.30"
+            const match = message && message.match(/coordinate\s+([0-9\.\-]+),\s*([0-9\.\-]+)/i);
+            if (!match) return;
+
+            const badLon = Number(match[1]);
+            const badLat = Number(match[2]);
+            if (Number.isNaN(badLon) || Number.isNaN(badLat)) return;
+
+            let bestField = null;
+            let bestDist = Infinity;
+
+            fields.forEach((f) => {
+                const d = haversineKm(badLon, badLat, f.lon, f.lat);
+                if (d < bestDist) {
+                    bestDist = d;
+                    bestField = f;
+                }
+            });
+
+            if (bestField && bestField.marker) {
+                bestField.marker.setStyle({
+                    color: '#000000',
+                    fillColor: '#ffffff'
+                });
+                bestField.marker.bindPopup(
+                    `Field #${bestField.id}<br/>Suspected to be far from routable roads.<br/>Try moving it closer to the road network.`
+                );
+                bestField.marker.openPopup();
+            }
+        }
+
+        // --- Render ORS result & metrics ---
+        function renderSolution(solution) {
+            if (solution.error) {
+                showErrorPanel('ORS error', [JSON.stringify(solution.error)]);
+                return;
+            }
+
+            const routes = solution.routes || [];
+            if (!routes.length) {
+                showErrorPanel('No routes', ['Optimizer returned no routes.']);
+                return;
+            }
+
+            const fieldsById = {};
+            fields.forEach((f) => {
+                fieldsById[f.id] = f;
+            });
+
+            const vehicleById = {};
+            vehicles.forEach((v) => {
+                vehicleById[v.id] = v;
+            });
+
+            // Mark unassigned fields (if any)
+            const unassignedIds = new Set();
+            (solution.unassigned || []).forEach((u) => {
+                const id = u.id ?? u.job;
+                if (id != null) unassignedIds.add(id);
+            });
+
+            // Reset markers
+            fields.forEach((f) => {
+                if (f.marker) {
+                    f.marker.setStyle({
+                        color: '#2c7be5',
+                        fillColor: '#2c7be5'
+                    });
+                }
+            });
+
+            if (unassignedIds.size > 0) {
+                fields.forEach((f) => {
+                    if (unassignedIds.has(f.id) && f.marker) {
+                        f.marker.setStyle({
+                            color: '#000000',
+                            fillColor: '#ffffff'
+                        });
+                    }
+                });
+            }
+
+            let totalDistanceKm = 0;
+            let totalDurationH = 0;
+            let summaryHtml = '';
+
+            // 👉 for AI: collect per-vehicle metrics
+            const vehicleFacts = [];
+
+            routes.forEach((route) => {
+                const vid = route.vehicle;
+                const v = vehicleById[vid];
+                const color = (v && v.color) || '#888';
+
+                // Decode geometry
+                let latlngs = [];
+                if (route.geometry && typeof polyline !== 'undefined') {
+                    const coords = polyline.decode(route.geometry); // [lat, lon]
+                    latlngs = coords.map(([lat, lon]) => [lat, lon]);
+                } else if (Array.isArray(route.steps)) {
+                    latlngs = route.steps.map((step) => {
+                        const loc = step.location; // [lon, lat]
+                        return [loc[1], loc[0]];
+                    });
+                }
+
+                if (latlngs.length) {
+                    const poly = L.polyline(latlngs, {
+                        color,
+                        weight: 4,
+                        opacity: 0.9
+                    }).addTo(map);
+                    routeLayers.push(poly);
+                }
+
+                const distanceKm = (route.distance || 0) / 1000;
+                const durationH = (route.duration || 0) / 3600;
+                totalDistanceKm += distanceKm;
+                totalDurationH += durationH;
+
+                let routeDemand = 0;
+                let fieldsCount = 0;
+
+                (route.steps || []).forEach((step) => {
+                    if (step.type === 'job') {
+                        const field = fieldsById[step.job];
+                        if (field) {
+                            routeDemand += field.demand;
+                            fieldsCount++;
+                            if (field.marker) {
+                                field.marker.setStyle({
+                                    color,
+                                    fillColor: color
+                                });
+                            }
+                        }
+                    }
+                });
+
+                const vehicleName = v ? v.name : `Vehicle ${vid}`;
+
+                summaryHtml += `
+          <div class="route-card">
+            <div class="route-title">
+              <div class="color-dot" style="background:${color}"></div>
+              <span>${vehicleName} (id ${vid})</span>
+            </div>
+            <div>Assigned fields: ${fieldsCount}</div>
+            <div>Total cotton served: ${routeDemand.toFixed(1)} t</div>
+            <div>Distance (ORS): ${distanceKm.toFixed(1)} km</div>
+            <div>Travel time (ORS): ${durationH.toFixed(2)} h</div>
+          </div>
+        `;
+
+                // collect per-vehicle facts for AI
+                vehicleFacts.push({
+                    id: vid,
+                    name: vehicleName,
+                    distanceKm,
+                    durationH,
+                    loadTons: routeDemand,
+                    capacityTons: v ? Number(v.capacity) || null : null
+                });
+            });
+
+            if (routeLayers.length) {
+                map.fitBounds(routeLayers[0].getBounds().pad(0.2));
+            }
+
+            // --- Business metrics: capacity, baseline vs optimized ---
+            const totalDemand = fields.reduce(
+                (sum, f) => sum + (Number(f.demand) || 0),
+                0
+            );
+            const totalCapacity = vehicles.reduce(
+                (sum, v) => sum + (Number(v.capacity) || 0),
+                0
+            );
+            const capacityUtil =
+                totalCapacity > 0 ? (totalDemand / totalCapacity) * 100 : 0;
+
+            const avgSpeedKmh = Number(avgSpeedInput.value) || 40;
+
+            // Baseline: each field served individually: depot -> field -> depot
+            let baselineDistanceKm = 0;
+            fields.forEach((f) => {
+                const d = haversineKm(depot.lon, depot.lat, f.lon, f.lat);
+                baselineDistanceKm += 2 * d;
+            });
+
+            const baselineTravelHours = baselineDistanceKm / avgSpeedKmh;
+            const optimizedTravelHours = totalDurationH; // ORS-based
+
+            const distanceSavedKm = baselineDistanceKm - totalDistanceKm;
+            const timeSavedH = baselineTravelHours - optimizedTravelHours;
+
+            const distanceSavedPct =
+                baselineDistanceKm > 0
+                    ? (distanceSavedKm / baselineDistanceKm) * 100
+                    : 0;
+            const timeSavedPct =
+                baselineTravelHours > 0
+                    ? (timeSavedH / baselineTravelHours) * 100
+                    : 0;
+
+            let unassignedHtml = '';
+            if (unassignedIds.size > 0) {
+                unassignedHtml = `
+          <div class="route-card" style="border-color:#f94144;">
+            <div class="route-title">
+              <span>Unassigned fields</span>
+            </div>
+            <div>${unassignedIds.size} field(s) could not be served (capacity or time constraints).</div>
+          </div>
+        `;
+            }
+
+            metricsEl.innerHTML = `
+        <h2>Metrics</h2>
+        <div>Total demand: ${totalDemand.toFixed(1)} t</div>
+        <div>Total capacity: ${totalCapacity.toFixed(1)} t</div>
+        <div>Capacity utilization: ${capacityUtil.toFixed(1)}%</div>
+        <br/>
+        <div><strong>Baseline (one field per trip):</strong></div>
+        <div>Distance: ${baselineDistanceKm.toFixed(1)} km</div>
+        <div>Travel time (@${avgSpeedKmh.toFixed(1)} km/h): ${baselineTravelHours.toFixed(2)} h</div>
+        <br/>
+        <div><strong>Optimized (ORS multi-vehicle):</strong></div>
+        <div>Distance: ${totalDistanceKm.toFixed(1)} km</div>
+        <div>Travel time (ORS): ${optimizedTravelHours.toFixed(2)} h</div>
+        <br/>
+        <div><strong>Estimated savings:</strong></div>
+        <div>Distance saved: ${distanceSavedKm.toFixed(1)} km (${distanceSavedPct.toFixed(1)}%)</div>
+        <div>Time saved: ${timeSavedH.toFixed(2)} h (${timeSavedPct.toFixed(1)}%)</div>
+        <div class="routes-container">${summaryHtml}${unassignedHtml}</div>
+      `;
+
+            // --- AI Insights block (Gemini) ---
+            try {
+                const facts = {
+                    totals: {
+                        totalDistanceKm,
+                        totalDurationH,
+                        baselineDistanceKm,
+                        baselineDurationH: baselineTravelHours,
+                        distanceSavedKm,
+                        distanceSavedPct,
+                        timeSavedH,
+                        timeSavedPct,
+                        totalDemandTons: totalDemand,
+                        totalCapacityTons: totalCapacity
+                    },
+                    vehicles: vehicleFacts,
+                    unassignedCount: unassignedIds.size
+                };
+
+                aiInsightsEl.innerHTML = `
+          <div class="route-card">
+            <div class="route-title">AI Insights</div>
+            <div style="font-size: 12px; color: #666;">Thinking...</div>
+          </div>
+        `;
+
+                fetch(`${API_BASE_URL}/ai-summary`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ facts })
+                })
+                    .then((r) => r.json())
+                    .then((data) => {
+                        if (!data || !data.text) {
+                            throw new Error("No text in AI response");
+                        }
+                        aiInsightsEl.innerHTML = `
+                  <div class="route-card">
+                    <div class="route-title">AI Insights</div>
+                    <div style="font-size:13px; white-space:pre-line;">
+                      ${data.text.replace(/</g, "&lt;")}
+                    </div>
+                  </div>
+                `;
+                    })
+                    .catch((err) => {
+                        console.error("AI insights error:", err);
+                        aiInsightsEl.innerHTML = `
+                  <div class="route-card">
+                    <div class="route-title">AI Insights</div>
+                    <div style="font-size:12px; color:#b00;">
+                      Couldn't generate AI summary this time.
+                    </div>
+                  </div>
+                `;
+                    });
+            } catch (e) {
+                console.error("Error building AI facts:", e);
+            }
+        }
+
+    </script>
+</body>
+
+</html>

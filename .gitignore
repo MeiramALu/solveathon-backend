@@ -1,0 +1,174 @@
+# Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+*.log
+media/
+staticfiles/
+static/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Machine Learning Models (large files)
+*.h5
+*.pkl
+*.joblib
+*.onnx
+# Keep specific project models
+!ml_models/cotton_model.keras
+!models/cotton_model.keras
+!smart_cotton_system/ml_models/cotton_model.keras
+!smart_cotton_system/models/cotton_model.keras
+
+# Data files (large datasets)
+*.csv
+*.xlsx
+*.xls
+# Keep JSON configuration files
+!**/data/*.json
+!cotton_varieties.json
+!smart_cotton_system/ml_models/cotton_varieties.json
+
+# Dataset directories with large data
+task_1_dataset/dataset/*.csv
+task_1_dataset/figures/*.png
+task_1_dataset/figures/*.jpg
+
+# Backup files
+*.bak
+backup.json
+*.backup
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+
+# Next.js
+.next/
+out/
+build/
+dist/
+*.tsbuildinfo
+next-env.d.ts
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+coverage/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Flask
+instance/
+.webassets-cache
+
+# Scrapy
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+.pybuilder/
+target/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath
+*.sage.py
+
+# Environments
+.env
+.envrc
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# pytype static type analyzer
+.pytype/
+
+# Cython debug symbols
+cython_debug/
+
+# Ruff
+.ruff_cache/
+
+# PyPI configuration
+.pypirc
+
+# Cursor AI Editor
+.cursorignore
+.cursorindexingignore
+
+# Marimo
+marimo/_static/
+marimo/_lsp/
+__marimo__/
+
+# OS specific
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*~
+
+# Simulation and test outputs
+realtime_simulation.log
+test_results/

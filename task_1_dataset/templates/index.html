@@ -1,0 +1,405 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Water Management AI Map</title>
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      padding: 8px 16px;
+      background: #0f172a;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header h1 {
+      font-size: 1.1rem;
+      margin: 0;
+    }
+
+    header .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    header label {
+      font-size: 0.85rem;
+    }
+
+    header select,
+    header input[type="range"] {
+      font-size: 0.85rem;
+      padding: 2px 4px;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      grid-template-rows: 1fr;
+      flex: 1;
+      min-height: 0;
+    }
+
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+
+    #side-panel {
+      border-left: 1px solid #e5e7eb;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-y: auto;
+      background: #f9fafb;
+    }
+
+    #time-series-container {
+      background: white;
+      border-radius: 8px;
+      padding: 8px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+    }
+
+    #summary {
+      background: white;
+      border-radius: 8px;
+      padding: 8px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+    }
+
+    .legend {
+      background: white;
+      border-radius: 8px;
+      padding: 6px 8px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+      font-size: 0.75rem;
+    }
+
+    .legend span {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      margin-right: 4px;
+    }
+
+    .bold {
+      font-weight: 600;
+    }
+
+    .small {
+      font-size: 0.8rem;
+      color: #4b5563;
+    }
+
+    button {
+      border: none;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>💧 Water Resource Management AI – Moisture Map</h1>
+    <div class="controls">
+      <label>
+        Date:
+        <select id="date-select"></select>
+      </label>
+      <label>
+        Dryness threshold (%):
+        <input type="range" id="dry-threshold" min="10" max="45" value="30" />
+        <span id="dry-threshold-value" class="small">30</span>
+      </label>
+    </div>
+  </header>
+
+  <main>
+    <div id="map"></div>
+    <div id="side-panel">
+      <div id="summary">
+        <h3 style="margin-top:0;">Day Overview</h3>
+        <p id="summary-text" class="small">Loading...</p>
+        <div class="legend">
+          <div><span style="background:#22c55e;"></span> Higher predicted moisture</div>
+          <div><span style="background:#f97316;"></span> Medium predicted moisture</div>
+          <div><span style="background:#ef4444;"></span> Low predicted moisture</div>
+          <div class="small" style="margin-top:4px;">Circle size = recommended irrigation amount</div>
+        </div>
+      </div>
+
+      <div id="time-series-container">
+        <h3 style="margin-top:0;">Sensor Time Series</h3>
+        <p id="ts-info" class="small">Click a point on the map to see its time series.</p>
+        <canvas id="ts-chart"></canvas>
+      </div>
+    </div>
+  </main>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script>
+    let map;
+    let markersLayer;
+    let tsChart = null;
+    let latestPoints = [];
+    let currentDryThreshold = 30;
+
+    // --- Utility: color by humidity ---
+    function humidityColor(h) {
+      // simple interpolation: 0-20 = red, 20-35 = orange, >35 = green
+      if (h <= 20) return "#ef4444";
+      if (h <= 35) return "#f97316";
+      return "#22c55e";
+    }
+
+    // --- Init map ---
+    function initMap() {
+  // Center near real cotton region in Turkistan (Maktaaral / south of Shymkent)
+  map = L.map("map").setView([40.84, 68.24], 11);
+
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/">OSM</a>',
+  }).addTo(map);
+
+  markersLayer = L.layerGroup().addTo(map);
+}
+
+
+    // --- Fetch available dates ---
+    async function loadDates() {
+      const res = await fetch("/api/dates");
+      const data = await res.json();
+      const select = document.getElementById("date-select");
+      select.innerHTML = "";
+
+      data.dates.forEach((d) => {
+        const opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        select.appendChild(opt);
+      });
+
+      // default: last date (latest)
+      select.value = data.dates[data.dates.length - 1];
+      loadMapData(select.value);
+    }
+
+    // --- Load map points for selected date ---
+    async function loadMapData(dateStr) {
+      const res = await fetch(`/api/map?date=${dateStr}`);
+      const data = await res.json();
+      latestPoints = data.points || [];
+
+      updateSummary();
+      drawMarkers();
+    }
+
+    // --- Update summary panel ---
+    function updateSummary() {
+      const summary = document.getElementById("summary-text");
+      if (!latestPoints.length) {
+        summary.textContent = "No data for this date.";
+        return;
+      }
+
+      const n = latestPoints.length;
+      const avgPred = latestPoints.reduce((acc, p) => acc + p.pred_humidity, 0) / n;
+      const dryN = latestPoints.filter((p) => p.pred_humidity < currentDryThreshold).length;
+
+      summary.innerHTML = `
+        <span class="bold">${n}</span> locations with predictions.<br/>
+        Average predicted humidity: <span class="bold">${avgPred.toFixed(1)}%</span><br/>
+        Spots below ${currentDryThreshold}%: <span class="bold">${dryN}</span>
+      `;
+    }
+
+    // --- Draw markers on the map ---
+    // --- Draw markers on the map ---
+    function drawMarkers() {
+    markersLayer.clearLayers();
+    if (!latestPoints.length) return;
+
+    // Fit map bounds to visual coordinates returned by backend
+    const latLngs = latestPoints.map((p) => [p.lat, p.lon]);
+    const bounds = L.latLngBounds(latLngs);
+    map.fitBounds(bounds, { padding: [20, 20] });
+
+    latestPoints.forEach((p) => {
+        const col = humidityColor(p.pred_humidity);
+
+        // scale radius by recommended irrigation
+        const baseRadius = 4;
+        const radius = baseRadius + (p.recommended_irrigation / 50.0) * 16; // adjust scaling
+
+        // Use visual lat/lon (Maktaaral-anchored) on the map
+        const marker = L.circleMarker([p.lat, p.lon], {
+        radius: radius,
+        color: "#111827",
+        weight: 0.5,
+        fillColor: col,
+        fillOpacity: 0.8,
+        });
+
+        const riskEmoji = p.pred_humidity < currentDryThreshold ? "⚠️" : "✅";
+
+        const popupHtml = `
+        <div style="font-size:0.8rem;">
+            <div class="bold">Cotton field cell (Turkistan region)</div>
+            <div>Approx location: <span class="bold">${p.lat.toFixed(4)}, ${p.lon.toFixed(4)}</span></div>
+            <div class="small">Internal sensor coords: (${p.loc_x.toFixed(4)}, ${p.loc_y.toFixed(4)})</div>
+
+            <div>Current humidity: <span class="bold">${p.soil_humidity.toFixed(1)}%</span></div>
+            <div>Predicted humidity (tomorrow): <span class="bold">${p.pred_humidity.toFixed(1)}%</span> ${riskEmoji}</div>
+            <div>Days since irrigation: <span class="bold">${p.days_since_irrigation}</span></div>
+            <div>Last irrigation: <span class="bold">${p.irrigation.toFixed(1)} m³/mu</span></div>
+            <div>Recommended irrigation: <span class="bold">${p.recommended_irrigation.toFixed(1)} m³/mu</span> (${p.action})</div>
+            <hr/>
+            <button onclick="loadTimeSeries(${p.loc_x}, ${p.loc_y})">Show time series</button>
+        </div>
+        `;
+
+        marker.bindPopup(popupHtml);
+        marker.addTo(markersLayer);
+    });
+    }
+
+
+    // --- Load time series for selected point ---
+    async function loadTimeSeries(loc_x, loc_y) {
+      const res = await fetch(`/api/timeseries?loc_x=${loc_x}&loc_y=${loc_y}`);
+      const data = await res.json();
+      const dates = data.dates || [];
+      const actual = data.actual || [];
+      const pred = data.pred || [];
+      const irr = data.irrigation || [];
+
+      const info = document.getElementById("ts-info");
+      if (!dates.length) {
+        info.textContent = "No time series available for this location.";
+        return;
+      }
+
+      info.textContent = `Location (${loc_x.toFixed(4)}, ${loc_y.toFixed(4)}). Actual vs Predicted humidity & irrigation.`;
+
+      const ctx = document.getElementById("ts-chart").getContext("2d");
+      if (tsChart) {
+        tsChart.destroy();
+      }
+
+      tsChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: dates,
+          datasets: [
+            {
+              label: "Actual humidity (%)",
+              data: actual,
+              borderColor: "#1d4ed8",
+              backgroundColor: "rgba(37,99,235,0.1)",
+              tension: 0.2,
+              yAxisID: "y1",
+            },
+            {
+              label: "Predicted humidity (%)",
+              data: pred,
+              borderColor: "#22c55e",
+              backgroundColor: "rgba(34,197,94,0.1)",
+              tension: 0.2,
+              yAxisID: "y1",
+            },
+            {
+              label: "Irrigation (m³/mu)",
+              data: irr,
+              borderColor: "#f97316",
+              backgroundColor: "rgba(249,115,22,0.1)",
+              type: "bar",
+              yAxisID: "y2",
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y1: {
+              type: "linear",
+              position: "left",
+              title: { display: true, text: "Humidity (%)" },
+            },
+            y2: {
+              type: "linear",
+              position: "right",
+              title: { display: true, text: "Irrigation (m³/mu)" },
+              grid: { drawOnChartArea: false },
+            },
+          },
+          plugins: {
+            legend: { display: true },
+          },
+        },
+      });
+    }
+
+    // --- Event wiring ---
+    document.addEventListener("DOMContentLoaded", () => {
+      initMap();
+      loadDates();
+
+      const dateSelect = document.getElementById("date-select");
+      dateSelect.addEventListener("change", (e) => {
+        loadMapData(e.target.value);
+      });
+
+      const thresholdSlider = document.getElementById("dry-threshold");
+      const thresholdVal = document.getElementById("dry-threshold-value");
+      thresholdSlider.addEventListener("input", (e) => {
+        currentDryThreshold = parseInt(e.target.value, 10);
+        thresholdVal.textContent = currentDryThreshold;
+        // re-evaluate summary & marker popups
+        updateSummary();
+        drawMarkers();
+      });
+    });
+  </script>
+</body>
+</html>
