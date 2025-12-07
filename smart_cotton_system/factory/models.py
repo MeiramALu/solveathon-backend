@@ -4,13 +4,6 @@ import uuid
 
 
 class CottonBatch(models.Model):
-    """
-    Партия хлопка.
-    Содержит:
-    1. Идентификацию (Код, Фермер)
-    2. Данные лабораторного анализа (HVI)
-    3. Итоговый результат (Output)
-    """
     STATUS_CHOICES = (
         ('RECEIVED', 'Принято'),
         ('ANALYZED', 'Проанализировано'),
@@ -20,13 +13,13 @@ class CottonBatch(models.Model):
     # --- 1. ИДЕНТИФИКАЦИЯ (IDENTIFICATION) ---
     batch_code = models.CharField(max_length=50, unique=True, blank=True, verbose_name="Код партии (ID)")
     farmer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Фермер")
-
-    # Файлы
+    seed_variety = models.CharField(max_length=100, null=True, blank=True, verbose_name="Сорт семян")
     cotton_image = models.ImageField(upload_to='cotton_images/', null=True, blank=True, verbose_name="Фото образца")
     hvi_file = models.FileField(upload_to='hvi_docs/', null=True, blank=True, verbose_name="HVI файл")
-
+    weight_kg = models.FloatField(default=0, verbose_name="Вес партии (кг)")
     # --- 2. HVI ПОКАЗАТЕЛИ (INPUT DATA) ---
     # Зрелость и прочность
+    moisture = models.FloatField(null=True, blank=True, verbose_name="Влажность (%)")
     micronaire = models.FloatField(null=True, blank=True, verbose_name="Micronaire (3.5–4.9)")
     strength = models.FloatField(null=True, blank=True, verbose_name="Strength (г/текс)")
 

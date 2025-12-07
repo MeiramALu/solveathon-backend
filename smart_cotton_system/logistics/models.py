@@ -5,8 +5,8 @@ from django.conf import settings
 class Vehicle(models.Model):
     plate_number = models.CharField(max_length=20, verbose_name="Гос. номер")
     driver = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, verbose_name="Водитель")
-    status = models.CharField(max_length=20, default='IDLE', verbose_name="Статус")  # MOVING, UNLOADING
-
+    status = models.CharField(max_length=20, default='IDLE', verbose_name="Статус")
+    current_load = models.FloatField(default=0, verbose_name="Текущий вес груза (кг)")
     def __str__(self):
         return self.plate_number
 

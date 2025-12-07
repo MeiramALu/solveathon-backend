@@ -1,36 +1,55 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.conf import settings
 from .models import SafetyAlert
-from .services import check_fire_with_roboflow
+from .services import check_with_roboflow
 
 
 @receiver(post_save, sender=SafetyAlert)
-def auto_detect_fire(sender, instance, created, **kwargs):
-    # Запускаем только если это новая запись и есть картинка
+def auto_detect_threats(sender, instance, created, **kwargs):
+    # Запускаем только если создана новая запись со снимком
     if created and instance.snapshot:
-        print(f"🔥 Safety AI: Отправляем фото в Roboflow...")
+        print(f"🔍 Safety AI: Начинаем анализ изображения...")
 
-        # 1. Отправляем в API
-        predictions = check_fire_with_roboflow(instance.snapshot.path)
+        # --- ЭТАП 1: Проверка на ПОЖАР (Приоритет) ---
+        fire_preds = check_with_roboflow(
+            instance.snapshot.path,
+            settings.ROBOFLOW_FIRE_MODEL_ID,
+            settings.ROBOFLOW_FIRE_VERSION
+        )
 
-        if predictions:
-            # Берем самое уверенное предсказание (первое или с макс. confidence)
-            best_pred = max(predictions, key=lambda x: x['confidence'])
+        best_pred = None
 
-            # 2. Обновляем данные в базе
-            instance.confidence = best_pred['confidence']
-            instance.detection_details = best_pred  # Сохраняем x, y, width, height
-
-            # 3. Определяем тип угрозы по классу из Roboflow
-            ml_class = best_pred['class']  # Например "Fire-Smoke"
-
-            if "Fire" in ml_class or "Smoke" in ml_class:
+        # Ищем огонь или дым
+        if fire_preds:
+            fire_threat = max(fire_preds, key=lambda x: x['confidence'])
+            if fire_threat['confidence'] > 0.4:
+                best_pred = fire_threat
                 instance.alert_type = 'FIRE'
-            elif "Helmet" in ml_class:  # Если у вас модель умеет искать каски
-                instance.alert_type = 'NO_HELMET'
-            else:
-                instance.alert_type = 'DANGER_ZONE'
 
-            # Сохраняем (update_fields важно, чтобы не зациклить)
+        # --- ЭТАП 2: Если пожара нет, проверяем КАСКИ (PPE) ---
+        if not best_pred:
+            ppe_preds = check_with_roboflow(
+                instance.snapshot.path,
+                settings.ROBOFLOW_PPE_MODEL_ID,
+                settings.ROBOFLOW_PPE_VERSION
+            )
+
+            # В этой модели классы обычно: 'NO-Helmet', 'NO-Vest', 'Helmet', 'Vest'
+            # Нас интересуют только нарушения (NO-...)
+            violations = [p for p in ppe_preds if 'NO' in p['class'].upper()]
+
+            if violations:
+                best_pred = max(violations, key=lambda x: x['confidence'])
+                instance.alert_type = 'NO_HELMET'
+
+        # --- ЭТАП 3: Сохранение результата ---
+        if best_pred:
+            instance.confidence = best_pred['confidence']
+            instance.detection_details = best_pred
+
+            # Сохраняем (update_fields нужен, чтобы не вызвать сигнал снова)
             instance.save(update_fields=['alert_type', 'confidence', 'detection_details'])
-            print(f"✅ Угроза обнаружена: {instance.alert_type} ({instance.confidence:.2f})")
+            print(f"✅ УГРОЗА ПОДТВЕРЖДЕНА: {instance.alert_type}")
+        else:
+            print("✅ Угроз не обнаружено.")
