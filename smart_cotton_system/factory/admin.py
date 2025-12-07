@@ -4,22 +4,33 @@ from .models import CottonBatch, Machine, MaintenanceLog
 
 @admin.register(CottonBatch)
 class CottonBatchAdmin(admin.ModelAdmin):
-    # В списке сразу видно: ID партии, Фермера и Итоговый класс
-    list_display = ('batch_code', 'farmer', 'quality_class', 'status', 'created_at')
+    # В списке теперь видно: Качество HVI, Чистоту CV и Регион
+    list_display = ('batch_code', 'farmer', 'quality_class', 'cv_status', 'region', 'status')
 
-    list_filter = ('status', 'quality_class', 'created_at')
+    # Фильтры: можно найти весь "Грязный" хлопок или хлопок с "Юга"
+    list_filter = ('status', 'quality_class', 'cv_status', 'region', 'created_at')
+
     search_fields = ('batch_code', 'farmer__username')
 
+    # Защищаем поля AI от ручного редактирования (чтобы видели, но не меняли)
+    readonly_fields = ('quality_class', 'cv_status', 'cv_confidence', 'created_at')
+
     fieldsets = (
-        ('Идентификация (Output ID)', {
-            'fields': ('batch_code', 'farmer', 'status')
+        ('Идентификация', {
+            'fields': ('batch_code', 'farmer', 'status', 'created_at')
         }),
-        ('Результат анализа (Target)', {
-            'fields': ('quality_class',)
+        ('Агрономия (Для подбора семян)', {
+            # Важные поля для 3-го пункта ТЗ
+            'fields': ('region', 'seed_variety', 'weight_kg')
         }),
-        ('Параметры HVI', {
+        ('Результаты AI анализа (Вычисляются автоматически)', {
+            # Сюда пишут результаты HVI и CV
+            'fields': ('quality_class', 'cv_status', 'cv_confidence')
+        }),
+        ('Параметры HVI (Входные данные)', {
             'fields': (
-                ('micronaire', 'strength', 'length', 'uniformity'),
+                ('moisture', 'micronaire', 'strength'),  # Добавили влажность
+                ('length', 'uniformity'),
                 ('trash_grade', 'trash_cnt', 'trash_area'),
                 ('sfi', 'sci', 'color_grade')
             )
@@ -28,14 +39,18 @@ class CottonBatchAdmin(admin.ModelAdmin):
             'fields': ('cotton_image', 'hvi_file')
         }),
     )
-    readonly_fields = ('created_at',)
 
 
 @admin.register(Machine)
 class MachineAdmin(admin.ModelAdmin):
-    list_display = ('name', 'status', 'last_temp', 'is_active')
+    # Добавили вибрацию и нагрузку в список, чтобы сразу видеть перегрев
+    list_display = ('name', 'status', 'last_temp', 'last_vibration', 'last_motor_load', 'updated_at')
+    list_filter = ('status', 'is_active')
+    search_fields = ('name',)
 
 
 @admin.register(MaintenanceLog)
 class MaintenanceLogAdmin(admin.ModelAdmin):
     list_display = ('machine', 'timestamp', 'is_prediction', 'probability_failure')
+    list_filter = ('is_prediction', 'machine')
+    readonly_fields = ('timestamp',)

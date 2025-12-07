@@ -3,53 +3,106 @@ from django.dispatch import receiver
 from django.conf import settings
 from .models import SafetyAlert
 from .services import check_with_roboflow
+import threading
 
 
 @receiver(post_save, sender=SafetyAlert)
 def auto_detect_threats(sender, instance, created, **kwargs):
-    # Запускаем только если создана новая запись со снимком
     if created and instance.snapshot:
-        print(f"🔍 Safety AI: Начинаем анализ изображения...")
+        print(f"🚀 Старт анализа (ID: {instance.id})")
+        thread = threading.Thread(target=process_image, args=(instance,))
+        thread.start()
 
-        # --- ЭТАП 1: Проверка на ПОЖАР (Приоритет) ---
+
+def process_image(instance):
+    try:
+        image_path = instance.snapshot.path
+
+        # --- ШАГ 1: ПОЖАР (Fire) ---
+        print("🔥 Проверка модели пожара...")
         fire_preds = check_with_roboflow(
-            instance.snapshot.path,
+            image_path,
             settings.ROBOFLOW_FIRE_MODEL_ID,
             settings.ROBOFLOW_FIRE_VERSION
         )
 
-        best_pred = None
+        # --- ШАГ 2: КАСКИ (PPE) ---
+        print("👷 Проверка модели касок...")
+        ppe_preds = check_with_roboflow(
+            image_path,
+            settings.ROBOFLOW_PPE_MODEL_ID,
+            settings.ROBOFLOW_PPE_VERSION
+        )
 
-        # Ищем огонь или дым
+        # --- ШАГ 3: АНАЛИЗ УГРОЗ ---
+        all_threats = []
+
+        # 3.1 Пожар
         if fire_preds:
-            fire_threat = max(fire_preds, key=lambda x: x['confidence'])
-            if fire_threat['confidence'] > 0.4:
-                best_pred = fire_threat
-                instance.alert_type = 'FIRE'
+            fire_objects = [p for p in fire_preds if p['confidence'] >= 0.4]
+            if fire_objects:
+                best_fire = max(fire_objects, key=lambda x: x['confidence'])
+                best_fire['custom_type'] = 'FIRE'
+                all_threats.append(best_fire)
 
-        # --- ЭТАП 2: Если пожара нет, проверяем КАСКИ (PPE) ---
-        if not best_pred:
-            ppe_preds = check_with_roboflow(
-                instance.snapshot.path,
-                settings.ROBOFLOW_PPE_MODEL_ID,
-                settings.ROBOFLOW_PPE_VERSION
-            )
+        # 3.2 Каски (УЛУЧШЕННАЯ ЛОГИКА)
+        if ppe_preds:
+            # Собираем, что мы нашли
+            found_helmet = False
+            found_vest = False
+            best_vest_pred = None
 
-            # В этой модели классы обычно: 'NO-Helmet', 'NO-Vest', 'Helmet', 'Vest'
-            # Нас интересуют только нарушения (NO-...)
-            violations = [p for p in ppe_preds if 'NO' in p['class'].upper()]
+            # Есть ли явные классы "NO-Helmet"?
+            explicit_violations = []
 
-            if violations:
-                best_pred = max(violations, key=lambda x: x['confidence'])
-                instance.alert_type = 'NO_HELMET'
+            for p in ppe_preds:
+                cls = p['class'].upper()
+                conf = p['confidence']
 
-        # --- ЭТАП 3: Сохранение результата ---
-        if best_pred:
-            instance.confidence = best_pred['confidence']
-            instance.detection_details = best_pred
+                # Запоминаем, что нашли
+                if 'HELMET' in cls and 'NO' not in cls:
+                    found_helmet = True
 
-            # Сохраняем (update_fields нужен, чтобы не вызвать сигнал снова)
-            instance.save(update_fields=['alert_type', 'confidence', 'detection_details'])
-            print(f"✅ УГРОЗА ПОДТВЕРЖДЕНА: {instance.alert_type}")
+                if 'VEST' in cls and 'NO' not in cls:
+                    found_vest = True
+                    if not best_vest_pred or conf > best_vest_pred['confidence']:
+                        best_vest_pred = p  # Запоминаем жилет как "улику"
+
+                # Если модель умеет искать NO-HELMET
+                if conf >= 0.20 and ('NO' in cls or 'MISSING' in cls or 'HEAD' in cls):
+                    explicit_violations.append(p)
+
+            # СЦЕНАРИЙ А: Модель нашла явное "Нет каски" или "Голова"
+            if explicit_violations:
+                best_violation = max(explicit_violations, key=lambda x: x['confidence'])
+                best_violation['custom_type'] = 'NO_HELMET'
+                all_threats.append(best_violation)
+
+            # СЦЕНАРИЙ Б (ДЕДУКЦИЯ): Есть Жилет, но НЕТ Каски -> Нарушение!
+            elif found_vest and not found_helmet:
+                print("   ⚠️ ЛОГИКА: Найден человек в жилете, но без каски!")
+                # Используем найденный жилет как координаты нарушения
+                violation_obj = best_vest_pred.copy()
+                violation_obj['custom_type'] = 'NO_HELMET'
+                violation_obj['confidence'] = 0.99  # Мы уверены, так как это логический вывод
+                all_threats.append(violation_obj)
+
+        # --- ШАГ 4: РЕШЕНИЕ ---
+        if all_threats:
+            winner = max(all_threats, key=lambda x: x['confidence'])
+            update_alert(instance, winner['custom_type'], winner)
         else:
-            print("✅ Угроз не обнаружено.")
+            print(f"✅ Угроз не обнаружено.")
+
+    except Exception as e:
+        print(f"❌ Ошибка в анализе: {e}")
+
+
+def update_alert(instance, alert_type, prediction):
+    instance.alert_type = alert_type
+    instance.confidence = prediction['confidence']
+    if 'custom_type' in prediction:
+        del prediction['custom_type']
+    instance.detection_details = prediction
+    instance.save(update_fields=['alert_type', 'confidence', 'detection_details'])
+    print(f"💾 ЗАПИСАНО В БД: {alert_type}")

@@ -34,7 +34,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'drf_yasg',
     'djoser',
-
     'users.apps.UsersConfig',
     'agronomy.apps.AgronomyConfig',
     'factory.apps.FactoryConfig',

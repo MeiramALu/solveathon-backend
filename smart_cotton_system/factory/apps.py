@@ -5,4 +5,5 @@ class FactoryConfig(AppConfig):
     name = 'factory'
 
     def ready(self):
-        import factory.signals
+        # ВОТ ЭТА СТРОКА ВКЛЮЧАЕТ АВТОМАТИКУ:
+        from . import signals

@@ -10,42 +10,44 @@ class CottonBatch(models.Model):
         ('EXPORT_READY', 'Готово к экспорту'),
     )
 
-    # --- 1. ИДЕНТИФИКАЦИЯ (IDENTIFICATION) ---
-    batch_code = models.CharField(max_length=50, unique=True, blank=True, verbose_name="Код партии (ID)")
+    # --- 1. ИДЕНТИФИКАЦИЯ ---
+    batch_code = models.CharField(max_length=50, unique=True, blank=True, verbose_name="Код партии")
     farmer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="Фермер")
+
+    # [NEW] Регион важен для рекомендации семян (Seed Recommendation)
+    region = models.CharField(max_length=100, default="South", verbose_name="Регион выращивания")
     seed_variety = models.CharField(max_length=100, null=True, blank=True, verbose_name="Сорт семян")
+    weight_kg = models.FloatField(default=0, verbose_name="Вес партии (кг)")
+
+    # Файлы
     cotton_image = models.ImageField(upload_to='cotton_images/', null=True, blank=True, verbose_name="Фото образца")
     hvi_file = models.FileField(upload_to='hvi_docs/', null=True, blank=True, verbose_name="HVI файл")
-    weight_kg = models.FloatField(default=0, verbose_name="Вес партии (кг)")
-    # --- 2. HVI ПОКАЗАТЕЛИ (INPUT DATA) ---
-    # Зрелость и прочность
+
+    # --- 2. HVI ПОКАЗАТЕЛИ (Входные данные для XGBoost) ---
     moisture = models.FloatField(null=True, blank=True, verbose_name="Влажность (%)")
-    micronaire = models.FloatField(null=True, blank=True, verbose_name="Micronaire (3.5–4.9)")
-    strength = models.FloatField(null=True, blank=True, verbose_name="Strength (г/текс)")
+    micronaire = models.FloatField(null=True, blank=True, verbose_name="Micronaire")
+    strength = models.FloatField(null=True, blank=True, verbose_name="Strength")
+    length = models.FloatField(null=True, blank=True, verbose_name="Length")
+    uniformity = models.FloatField(null=True, blank=True, verbose_name="Uniformity")
 
-    # Длина и равномерность
-    length = models.FloatField(null=True, blank=True, verbose_name="Length (дюймы)")
-    uniformity = models.FloatField(null=True, blank=True, verbose_name="Uniformity (%)")
+    trash_grade = models.IntegerField(null=True, blank=True, verbose_name="Trash Grade")
+    trash_cnt = models.IntegerField(null=True, blank=True, verbose_name="Trash Count")
+    trash_area = models.FloatField(null=True, blank=True, verbose_name="Trash Area")
 
-    # Засоренность (Trash)
-    trash_grade = models.IntegerField(null=True, blank=True, verbose_name="Trash Grade (1-7)")
-    trash_cnt = models.IntegerField(null=True, blank=True, verbose_name="Trash Count (шт)")
-    trash_area = models.FloatField(null=True, blank=True, verbose_name="Trash Area (%)")
+    sfi = models.FloatField(null=True, blank=True, verbose_name="SFI")
+    sci = models.IntegerField(null=True, blank=True, verbose_name="SCI")
+    color_grade = models.CharField(max_length=20, null=True, blank=True, verbose_name="Color Grade")
 
-    # Индексы (SFI, SCI)
-    sfi = models.FloatField(null=True, blank=True, verbose_name="Short Fiber Index (SFI)")
-    sci = models.IntegerField(null=True, blank=True, verbose_name="Spinning Consistency Index (SCI)")
+    # --- 3. РЕЗУЛЬТАТЫ ИИ (OUTPUT) ---
+    # Результат HVI (XGBoost)
+    quality_class = models.CharField(max_length=50, null=True, blank=True, verbose_name="Класс качества (HVI)")
 
-    # Цвет
-    color_grade = models.CharField(max_length=20, null=True, blank=True, verbose_name="Color Grade (напр. 31-1)")
+    # [NEW] Результат Computer Vision (TensorFlow)
+    cv_status = models.CharField(max_length=50, null=True, blank=True, verbose_name="Чистота (CV)")
+    cv_confidence = models.FloatField(null=True, blank=True, verbose_name="Уверенность CV")
 
-    # --- 3. РЕЗУЛЬТАТ (OUTPUT) ---
-    # Это целевая переменная, которую определяет ML или Лаборант
-    quality_class = models.CharField(max_length=50, null=True, blank=True, verbose_name="★ Quality Class (Target)")
-
-    # Системные поля
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='RECEIVED', verbose_name="Статус")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='RECEIVED')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def save(self, *args, **kwargs):
         if not self.batch_code:
@@ -53,7 +55,7 @@ class CottonBatch(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.batch_code} | Class: {self.quality_class}"
+        return f"{self.batch_code} | {self.quality_class}"
 
 
 # --- Модели станков (оставляем без изменений) ---
