@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { Worker, RiskLevel } from '@/types/safety';
+import { Worker, RiskLevel, SimulationType } from '@/types/safety';
 import WorkerSidebar from '@/components/safety/worker-sidebar';
 import StatsBar from '@/components/safety/stats-bar';
 import SafetyMap from '@/components/safety/safety-map';
@@ -118,7 +118,7 @@ export default function SafetyMonitoringPage() {
     };
 
     // Trigger simulation
-    const handleSimulate = async (simType: 'panic' | 'toxic' | 'fall' | 'reset') => {
+    const handleSimulate = async (simType: SimulationType) => {
         if (!selectedWorker) return;
 
         if (simType === 'reset') {
