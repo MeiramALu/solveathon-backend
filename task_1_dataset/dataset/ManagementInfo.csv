@@ -1,0 +1,205 @@
+process_batch,irrigation_time,reproductive_period,plant_variety,irrigation_amount(m3/mu),N(kg/hm2),P2O5(kg/hm2),K2O(kg/hm2),12%N_30%P_30%K,seed_cotton_yield(kg/mu),lint_production(kg/mu)
+T1,20240501,Seedling Stage,cotton,30.0,0.00,0.00,0.00,-,632.41,338.54
+T1,20240609,Bud Stage,cotton,26.66,15.20,6.86,7.65,-,632.41,338.54
+T1,20240619,Bud Stage,cotton,27.92,8.24,5.72,3.83,-,632.41,338.54
+T1,20240629,Bud Stage,cotton,29.88,24.71,17.16,11.48,-,632.41,338.54
+T1,20240709,Flowering and Boll Stage,cotton,37.29,45.60,33.55,18.36,-,632.41,338.54
+T1,20240714,Flowering and Boll Stage,cotton,23.54,45.60,33.55,18.36,-,632.41,338.54
+T1,20240724,Flowering and Boll Stage,cotton,51.65,45.60,33.55,18.36,-,632.41,338.54
+T1,20240730,Flowering and Boll Stage,cotton,35.77,53.20,70.91,61.20,-,632.41,338.54
+T1,20240809,Flowering and Boll Stage,cotton,36.82,15.20,27.45,13.77,-,632.41,338.54
+T1,20240817,Flowering and Boll Stage,cotton,39.9,0.00,0.00,0.00,-,632.41,338.54
+T1,20240823,Flowering and Boll Stage,cotton,24.35,0.00,0.00,0.00,-,632.41,338.54
+T1,20240825,Flowering and Boll Stage,cotton,0.0,0.00,0.00,0.00,-,632.41,338.54
+T2,20240501,Seedling Stage,cotton,25.8,0.00,0.00,0.00,-,597.28,263.66
+T2,20240609,Bud Stage,cotton,10.0,16.00,11.00,11.00,-,597.28,263.66
+T2,20240619,Bud Stage,cotton,24.0,25.00,18.00,18.00,-,597.28,263.66
+T2,20240629,Bud Stage,cotton,38.0,27.00,20.00,14.00,-,597.28,263.66
+T2,20240709,Flowering and Boll Stage,cotton,28.0,33.00,26.00,26.00,-,597.28,263.66
+T2,20240714,Flowering and Boll Stage,cotton,20.0,41.00,30.00,30.00,-,597.28,263.66
+T2,20240724,Flowering and Boll Stage,cotton,22.0,53.00,22.00,22.00,-,597.28,263.66
+T2,20240730,Flowering and Boll Stage,cotton,36.0,53.00,22.00,22.00,-,597.28,263.66
+T2,20240809,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,597.28,263.66
+T2,20240817,Flowering and Boll Stage,cotton,42.0,22.00,23.00,15.00,-,597.28,263.66
+T2,20240823,Flowering and Boll Stage,cotton,20.0,0.00,0.00,0.00,-,597.28,263.66
+T2,20240825,Flowering and Boll Stage,cotton,0.0,0.00,0.00,0.00,-,597.28,263.66
+T3,20240501,Seedling Stage,cotton,34.88,0.98,0.73,0.77,-,645.85,335.04
+T3,20240601,Bud Stage,cotton,29.07,0.00,0.00,0.00,-,645.85,335.04
+T3,20240612,Bud Stage,cotton,43.02,8.13,5.75,3.26,-,645.85,335.04
+T3,20240623,Bud Stage,cotton,37.21,7.21,4.90,3.90,-,645.85,335.04
+T3,20240702,Flowering and Boll Stage,cotton,40.7,0.00,0.00,0.00,-,645.85,335.04
+T3,20240712,Flowering and Boll Stage,cotton,40.7,23.18,19.82,12.68,-,645.85,335.04
+T3,20240719,Flowering and Boll Stage,cotton,34.88,14.82,9.57,3.24,-,645.85,335.04
+T3,20240726,Flowering and Boll Stage,cotton,34.88,22.39,11.98,6.71,-,645.85,335.04
+T3,20240802,Flowering and Boll Stage,cotton,23.26,11.80,16.31,16.57,-,645.85,335.04
+T3,20240810,Flowering and Boll Stage,cotton,31.4,10.06,12.85,8.58,-,645.85,335.04
+T3,20240819,Flowering and Boll Stage,cotton,29.07,6.24,11.28,5.67,-,645.85,335.04
+T3,20240829,Flowering and Boll Stage,cotton,26.74,0.00,0.00,0.00,-,645.85,335.04
+Tw,20240501,Seedling Stage,cotton,30.0,0.00,0.00,0.00,-,501.3,231.06
+Tw,20240609,Bud Stage,cotton,22.0,16.00,11.00,11.00,-,501.3,231.06
+Tw,20240619,Bud Stage,cotton,22.0,25.00,18.00,18.00,-,501.3,231.06
+Tw,20240629,Bud Stage,cotton,22.0,27.00,20.00,14.00,-,501.3,231.06
+Tw,20240709,Flowering and Boll Stage,cotton,22.0,33.00,26.00,26.00,-,501.3,231.06
+Tw,20240714,Flowering and Boll Stage,cotton,22.0,41.00,30.00,30.00,-,501.3,231.06
+Tw,20240724,Flowering and Boll Stage,cotton,26.0,53.00,22.00,22.00,-,501.3,231.06
+Tw,20240730,Flowering and Boll Stage,cotton,24.0,53.00,22.00,22.00,-,501.3,231.06
+Tw,20240809,Flowering and Boll Stage,cotton,32.0,0.00,0.00,0.00,-,501.3,231.06
+Tw,20240817,Flowering and Boll Stage,cotton,20.0,22.00,23.00,15.00,-,501.3,231.06
+Tw,20240823,Flowering and Boll Stage,cotton,20.0,0.00,0.00,0.00,-,501.3,231.06
+Tw,20240825,Flowering and Boll Stage,cotton,0.0,0.00,0.00,0.00,-,501.3,231.06
+D1,20240501,Seedling Stage,cotton,30.0,0.00,0.00,0.00,0,306.34,126.91
+D1,20240606,Bud Stage,cotton,30.0,2.00,0.00,0.00,4,306.34,126.91
+D1,20240619,Bud Stage,cotton,25.0,3.00,0.00,0.00,5,306.34,126.91
+D1,20240629,Bud Stage,cotton,25.0,3.00,0.00,0.00,8,306.34,126.91
+D1,20240709,Flowering and Boll Stage,cotton,30.0,8.00,0.00,0.00,6,306.34,126.91
+D1,20240714,Flowering and Boll Stage,cotton,27.0,8.00,0.00,0.00,10,306.34,126.91
+D1,20240722,Flowering and Boll Stage,cotton,27.0,8.00,0.00,0.00,9,306.34,126.91
+D1,20240728,Flowering and Boll Stage,cotton,27.0,8.00,0.00,0.00,6,306.34,126.91
+D1,20240810,Flowering and Boll Stage,cotton,25.0,6.00,0.00,3.50,3,306.34,126.91
+D1,20240818,Flowering and Boll Stage,cotton,20.0,4.00,0.00,1.00,0,306.34,126.91
+D1,20240823,Flowering and Boll Stage,cotton,20.0,0.00,0.00,0.00,0,306.34,126.91
+D1,20240825,Flowering and Boll Stage,cotton,0.0,0.00,0.00,0.00,0,306.34,126.91
+M1,20240419,Seedling Stage,cotton,30.0,0.00,0.00,0.00,0,504.43,226.92
+M1,20240606,Bud Stage,cotton,35.0,1.01,0.46,0.51,-,504.43,226.92
+M1,20240616,Bud Stage,cotton,25.0,0.55,0.38,0.26,-,504.43,226.92
+M1,20240628,Bud Stage,cotton,30.0,1.65,1.14,0.77,-,504.43,226.92
+M1,20240708,Flowering and Boll Stage,cotton,35.0,3.04,2.24,1.22,-,504.43,226.92
+M1,20240714,Flowering and Boll Stage,cotton,35.0,3.04,2.24,1.22,-,504.43,226.92
+M1,20240721,Flowering and Boll Stage,cotton,30.0,3.04,2.24,1.22,-,504.43,226.92
+M1,20240728,Flowering and Boll Stage,cotton,30.0,3.55,4.73,4.08,-,504.43,226.92
+M1,20240805,Flowering and Boll Stage,cotton,35.0,1.01,1.83,0.92,-,504.43,226.92
+M1,20240811,Flowering and Boll Stage,cotton,25.0,0.00,0.00,0.00,-,504.43,226.92
+M1,20240821,Flowering and Boll Stage,cotton,20.0,0.00,0.00,0.00,-,504.43,226.92
+M1,20240825,Flowering and Boll Stage,cotton,0.0,0.00,0.00,0.00,-,504.43,226.92
+M2,20240419,Seedling Stage,cotton,30.0,0.00,0.00,0.00,-,455.28,211.02
+M2,20240606,Bud Stage,cotton,31.0,1.01,0.46,0.51,-,455.28,211.02
+M2,20240616,Bud Stage,cotton,22.27,0.55,0.38,0.26,-,455.28,211.02
+M2,20240628,Bud Stage,cotton,26.73,1.65,1.14,0.77,-,455.28,211.02
+M2,20240708,Flowering and Boll Stage,cotton,31.13,3.04,2.24,1.22,-,455.28,211.02
+M2,20240714,Flowering and Boll Stage,cotton,31.13,3.04,2.24,1.22,-,455.28,211.02
+M2,20240721,Flowering and Boll Stage,cotton,26.68,3.04,2.24,1.22,-,455.28,211.02
+M2,20240728,Flowering and Boll Stage,cotton,26.68,3.55,4.73,4.08,-,455.28,211.02
+M2,20240805,Flowering and Boll Stage,cotton,31.13,1.01,1.83,0.92,-,455.28,211.02
+M2,20240811,Flowering and Boll Stage,cotton,22.24,0.00,0.00,0.00,-,455.28,211.02
+M2,20240821,Flowering and Boll Stage,cotton,18.0,0.00,0.00,0.00,-,455.28,211.02
+M2,20240825,Flowering and Boll Stage,cotton,0.0,0.00,0.00,0.00,-,455.28,211.02
+M3,20240419,Seedling Stage,cotton,30.0,0.00,0.00,0.00,-,604.16,283.29
+M3,20240606,Bud Stage,cotton,28.0,1.01,0.46,0.51,-,604.16,283.29
+M3,20240616,Bud Stage,cotton,21.7,0.55,0.38,0.26,-,604.16,283.29
+M3,20240628,Bud Stage,cotton,26.05,1.65,1.14,0.77,-,604.16,283.29
+M3,20240708,Flowering and Boll Stage,cotton,30.49,3.04,2.24,1.22,-,604.16,283.29
+M3,20240714,Flowering and Boll Stage,cotton,30.49,3.04,2.24,1.22,-,604.16,283.29
+M3,20240721,Flowering and Boll Stage,cotton,26.13,3.04,2.24,1.22,-,604.16,283.29
+M3,20240728,Flowering and Boll Stage,cotton,26.13,3.55,4.73,4.08,-,604.16,283.29
+M3,20240805,Flowering and Boll Stage,cotton,30.49,1.01,1.83,0.92,-,604.16,283.29
+M3,20240811,Flowering and Boll Stage,cotton,21.78,0.00,0.00,0.00,-,604.16,283.29
+M3,20240821,Flowering and Boll Stage,cotton,17.5,0.00,0.00,0.00,-,604.16,283.29
+M3,20240825,Flowering and Boll Stage,cotton,0.0,0.00,0.00,0.00,-,604.16,283.29
+M4,20240419,Seedling Stage,cotton,30.0,0.00,0.00,0.00,-,472.63,211.02
+M4,20240606,Bud Stage,cotton,24.5,1.01,0.46,0.51,-,472.63,211.02
+M4,20240616,Bud Stage,cotton,21.36,0.55,0.38,0.26,-,472.63,211.02
+M4,20240628,Bud Stage,cotton,25.64,1.65,1.14,0.77,-,472.63,211.02
+M4,20240708,Flowering and Boll Stage,cotton,29.84,3.04,2.24,1.22,-,472.63,211.02
+M4,20240714,Flowering and Boll Stage,cotton,29.84,3.04,2.24,1.22,-,472.63,211.02
+M4,20240721,Flowering and Boll Stage,cotton,25.58,3.04,2.24,1.22,-,472.63,211.02
+M4,20240728,Flowering and Boll Stage,cotton,25.58,3.55,4.73,4.08,-,472.63,211.02
+M4,20240805,Flowering and Boll Stage,cotton,29.84,1.01,1.83,0.92,-,472.63,211.02
+M4,20240811,Flowering and Boll Stage,cotton,21.32,0.00,0.00,0.00,-,472.63,211.02
+M4,20240821,Flowering and Boll Stage,cotton,17.0,0.00,0.00,0.00,-,472.63,211.02
+M4,20240825,Flowering and Boll Stage,cotton,0.0,0.00,0.00,0.00,-,472.63,211.02
+M5,20240419,Seedling Stage,cotton,30.0,0.00,0.00,0.00,-,569.47,225.47
+M5,20240606,Bud Stage,cotton,21.0,1.01,0.46,0.51,-,569.47,225.47
+M5,20240616,Bud Stage,cotton,21.02,0.55,0.38,0.26,-,569.47,225.47
+M5,20240628,Bud Stage,cotton,25.23,1.65,1.14,0.77,-,569.47,225.47
+M5,20240708,Flowering and Boll Stage,cotton,29.2,3.04,2.24,1.22,-,569.47,225.47
+M5,20240714,Flowering and Boll Stage,cotton,29.2,3.04,2.24,1.22,-,569.47,225.47
+M5,20240721,Flowering and Boll Stage,cotton,25.03,3.04,2.24,1.22,-,569.47,225.47
+M5,20240728,Flowering and Boll Stage,cotton,25.03,3.55,4.73,4.08,-,569.47,225.47
+M5,20240805,Flowering and Boll Stage,cotton,29.2,1.01,1.83,0.92,-,569.47,225.47
+M5,20240811,Flowering and Boll Stage,cotton,20.86,0.00,0.00,0.00,-,569.47,225.47
+M5,20240821,Flowering and Boll Stage,cotton,16.5,0.00,0.00,0.00,-,569.47,225.47
+M5,20240825,Flowering and Boll Stage,cotton,0.0,0.00,0.00,0.00,-,569.47,225.47
+M6,20240419,Seedling Stage,cotton,30.0,0.00,0.00,0.00,-,446.61,213.91
+M6,20240606,Bud Stage,cotton,31.0,1.01,0.46,0.51,-,446.61,213.91
+M6,20240616,Bud Stage,cotton,22.27,0.55,0.38,0.26,-,446.61,213.91
+M6,20240628,Bud Stage,cotton,26.73,1.65,1.14,0.77,-,446.61,213.91
+M6,20240708,Flowering and Boll Stage,cotton,31.13,3.04,2.24,1.22,-,446.61,213.91
+M6,20240714,Flowering and Boll Stage,cotton,31.13,3.04,2.24,1.22,-,446.61,213.91
+M6,20240721,Flowering and Boll Stage,cotton,26.68,3.04,2.24,1.22,-,446.61,213.91
+M6,20240728,Flowering and Boll Stage,cotton,26.68,3.55,4.73,4.08,-,446.61,213.91
+M6,20240805,Flowering and Boll Stage,cotton,31.13,1.01,1.83,0.92,-,446.61,213.91
+M6,20240811,Flowering and Boll Stage,cotton,22.24,0.00,0.00,0.00,-,446.61,213.91
+M6,20240821,Flowering and Boll Stage,cotton,18.0,0.00,0.00,0.00,-,446.61,213.91
+M6,20240825,Flowering and Boll Stage,cotton,0.0,0.00,0.00,0.00,-,446.61,213.91
+Z1,20240419,Seedling Stage,cotton,30.0,-,-,-,-,650.41,299.19
+Z1,20240606,Bud Stage,cotton,35.0,13.68,6.18,6.89,-,650.41,299.19
+Z1,20240617,Bud Stage,cotton,25.0,7.41,5.15,3.44,-,650.41,299.19
+Z1,20240629,Bud Stage,cotton,25.0,22.24,15.44,10.33,-,650.41,299.19
+Z1,20240710,Flowering and Boll Stage,cotton,30.0,41.04,30.20,16.52,-,650.41,299.19
+Z1,20240714,Flowering and Boll Stage,cotton,25.0,41.04,30.20,16.52,-,650.41,299.19
+Z1,20240722,Flowering and Boll Stage,cotton,40.0,41.04,30.20,16.52,-,650.41,299.19
+Z1,20240730,Flowering and Boll Stage,cotton,35.0,47.88,63.82,55.08,-,650.41,299.19
+Z1,20240807,Flowering and Boll Stage,cotton,35.0,13.68,24.71,12.39,-,650.41,299.19
+Z1,20240811,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,650.41,299.19
+Z1,20240821,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,650.41,299.19
+Z1,20240825,Flowering and Boll Stage,cotton,20.0,0.00,0.00,0.00,-,650.41,299.19
+Z2,20240419,Seedling Stage,cotton,30.0,-,-,-,-,647.52,302.08
+Z2,20240606,Bud Stage,cotton,35.0,13.68,5.49,6.89,-,647.52,302.08
+Z2,20240617,Bud Stage,cotton,25.0,7.41,4.58,3.44,-,647.52,302.08
+Z2,20240629,Bud Stage,cotton,25.0,22.24,13.73,10.33,-,647.52,302.08
+Z2,20240710,Flowering and Boll Stage,cotton,30.0,41.04,26.84,16.52,-,647.52,302.08
+Z2,20240714,Flowering and Boll Stage,cotton,25.0,41.04,26.84,16.52,-,647.52,302.08
+Z2,20240722,Flowering and Boll Stage,cotton,40.0,41.04,26.84,16.52,-,647.52,302.08
+Z2,20240730,Flowering and Boll Stage,cotton,35.0,47.88,56.73,55.08,-,647.52,302.08
+Z2,20240807,Flowering and Boll Stage,cotton,35.0,13.68,21.96,12.39,-,647.52,302.08
+Z2,20240811,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,647.52,302.08
+Z2,20240821,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,647.52,302.08
+Z2,20240825,Flowering and Boll Stage,cotton,20.0,0.00,0.00,0.00,-,647.52,302.08
+Z3,20240419,Seedling Stage,cotton,30.0,-,-,-,-,458.18,218.25
+Z3,20240606,Bud Stage,cotton,35.0,13.68,4.80,6.89,-,458.18,218.25
+Z3,20240617,Bud Stage,cotton,25.0,7.41,4.00,3.44,-,458.18,218.25
+Z3,20240629,Bud Stage,cotton,25.0,22.24,12.01,10.33,-,458.18,218.25
+Z3,20240710,Flowering and Boll Stage,cotton,30.0,41.04,23.49,16.52,-,458.18,218.25
+Z3,20240714,Flowering and Boll Stage,cotton,25.0,41.04,23.49,16.52,-,458.18,218.25
+Z3,20240722,Flowering and Boll Stage,cotton,40.0,41.04,23.49,16.52,-,458.18,218.25
+Z3,20240730,Flowering and Boll Stage,cotton,35.0,47.88,49.64,55.08,-,458.18,218.25
+Z3,20240807,Flowering and Boll Stage,cotton,35.0,13.68,19.22,12.39,-,458.18,218.25
+Z3,20240811,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,458.18,218.25
+Z3,20240821,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,458.18,218.25
+Z3,20240825,Flowering and Boll Stage,cotton,20.0,0.00,0.00,0.00,-,458.18,218.25
+Z4,20240419,Seedling Stage,cotton,30.0,-,-,-,-,523.22,241.37
+Z4,20240606,Bud Stage,cotton,35.0,14.44,6.18,6.89,-,523.22,241.37
+Z4,20240617,Bud Stage,cotton,25.0,7.82,5.15,3.44,-,523.22,241.37
+Z4,20240629,Bud Stage,cotton,25.0,23.47,15.44,10.33,-,523.22,241.37
+Z4,20240710,Flowering and Boll Stage,cotton,30.0,43.32,30.20,16.52,-,523.22,241.37
+Z4,20240714,Flowering and Boll Stage,cotton,25.0,43.32,30.20,16.52,-,523.22,241.37
+Z4,20240722,Flowering and Boll Stage,cotton,40.0,43.32,30.20,16.52,-,523.22,241.37
+Z4,20240730,Flowering and Boll Stage,cotton,35.0,50.54,63.82,55.08,-,523.22,241.37
+Z4,20240807,Flowering and Boll Stage,cotton,35.0,14.44,24.71,12.39,-,523.22,241.37
+Z4,20240811,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,523.22,241.37
+Z4,20240821,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,523.22,241.37
+Z4,20240825,Flowering and Boll Stage,cotton,20.0,0.00,0.00,0.00,-,523.22,241.37
+Z5,20240419,Seedling Stage,cotton,30.0,-,-,-,-,494.31,229.81
+Z5,20240606,Bud Stage,cotton,35.0,15.20,6.52,6.89,-,494.31,229.81
+Z5,20240617,Bud Stage,cotton,25.0,8.24,5.43,3.44,-,494.31,229.81
+Z5,20240629,Bud Stage,cotton,25.0,24.71,16.30,10.33,-,494.31,229.81
+Z5,20240710,Flowering and Boll Stage,cotton,30.0,45.60,31.88,16.52,-,494.31,229.81
+Z5,20240714,Flowering and Boll Stage,cotton,25.0,45.60,31.88,16.52,-,494.31,229.81
+Z5,20240722,Flowering and Boll Stage,cotton,40.0,45.60,31.88,16.52,-,494.31,229.81
+Z5,20240730,Flowering and Boll Stage,cotton,35.0,53.20,67.37,55.08,-,494.31,229.81
+Z5,20240807,Flowering and Boll Stage,cotton,35.0,15.20,26.08,12.39,-,494.31,229.81
+Z5,20240811,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,494.31,229.81
+Z5,20240821,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,494.31,229.81
+Z5,20240825,Flowering and Boll Stage,cotton,20.0,0.00,0.00,0.00,-,494.31,229.81
+Z6,20240419,Seedling Stage,cotton,30.0,-,-,-,-,575.25,265.94
+Z6,20240606,Bud Stage,cotton,35.0,15.96,6.86,6.89,-,575.25,265.94
+Z6,20240617,Bud Stage,cotton,25.0,8.65,5.72,3.44,-,575.25,265.94
+Z6,20240629,Bud Stage,cotton,25.0,25.95,17.16,10.33,-,575.25,265.94
+Z6,20240710,Flowering and Boll Stage,cotton,30.0,47.88,33.55,16.52,-,575.25,265.94
+Z6,20240714,Flowering and Boll Stage,cotton,25.0,47.88,33.55,16.52,-,575.25,265.94
+Z6,20240722,Flowering and Boll Stage,cotton,40.0,47.88,33.55,16.52,-,575.25,265.94
+Z6,20240730,Flowering and Boll Stage,cotton,35.0,55.86,70.91,55.08,-,575.25,265.94
+Z6,20240807,Flowering and Boll Stage,cotton,35.0,15.96,27.45,12.39,-,575.25,265.94
+Z6,20240811,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,575.25,265.94
+Z6,20240821,Flowering and Boll Stage,cotton,30.0,0.00,0.00,0.00,-,575.25,265.94
+Z6,20240825,Flowering and Boll Stage,cotton,20.0,0.00,0.00,0.00,-,575.25,265.94

@@ -1,0 +1,11 @@
+sequence_number,name,start_date,end_date,sensorevent_quantity
+0,Sensors,——,——,582
+1,Conduct Sensor,20240701,20240919,91018
+2,HeatFlux Sensor,20240701,20240919,91268
+3,Humidity Sensor,20240701,20240919,91018
+4,Insect Sensor,20240702,20240907,103
+5,Meterological Sensor,20240701,20240919,1569
+6,PHSensor,20240701,20240919,90587
+7,SoilNutSensor,20240701,20240919,90972
+8,SporeSensor,20240701,20240908,188
+9,TemSensor,20240701,20240919,91018
