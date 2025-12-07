@@ -1,0 +1,134 @@
+[
+  {
+    "id": "makhtaaral_4",
+    "name": "Махтаарал-4 (KZ)",
+    "origin": "Kazakhstan",
+    "max_yield": 48.0,
+    "gdd_needed": 1950,
+    "days_to_mature": 128,
+    "heat_tolerance": "high",
+    "salinity_tolerance": "high",
+    "description": "Эталон солеустойчивости. Самый надежный для Туркестанской области."
+  },
+  {
+    "id": "turkistan_1",
+    "name": "Туркестан-1 (KZ)",
+    "origin": "Kazakhstan",
+    "max_yield": 40.0,
+    "gdd_needed": 1750,
+    "days_to_mature": 115,
+    "heat_tolerance": "high",
+    "salinity_tolerance": "medium",
+    "description": "Скороспелый сорт. Идеален, если посев задержался."
+  },
+  {
+    "id": "m_4011",
+    "name": "М-4011 (KZ)",
+    "origin": "Kazakhstan",
+    "max_yield": 45.0,
+    "gdd_needed": 2000,
+    "days_to_mature": 130,
+    "heat_tolerance": "high",
+    "salinity_tolerance": "high",
+    "description": "Новый сорт с улучшенным качеством волокна."
+  },
+  {
+    "id": "xin_lu_zhong_42",
+    "name": "Xin Lu Zhong-42 (CN)",
+    "origin": "China",
+    "max_yield": 60.0,
+    "gdd_needed": 2200,
+    "days_to_mature": 135,
+    "heat_tolerance": "medium",
+    "salinity_tolerance": "low",
+    "description": "Китайский интенсивный сорт. Огромный урожай, но боится соли."
+  },
+  {
+    "id": "xin_lu_zhong_47",
+    "name": "Xin Lu Zhong-47 (CN)",
+    "origin": "China",
+    "max_yield": 65.0,
+    "gdd_needed": 2300,
+    "days_to_mature": 140,
+    "heat_tolerance": "medium",
+    "salinity_tolerance": "low",
+    "description": "Рекордсмен урожайности. Требует идеального полива."
+  },
+  {
+    "id": "s_4727",
+    "name": "C-4727 (Import)",
+    "origin": "Foreign",
+    "max_yield": 55.0,
+    "gdd_needed": 2100,
+    "days_to_mature": 132,
+    "heat_tolerance": "medium",
+    "salinity_tolerance": "medium",
+    "description": "Популярен, но требует длинного теплого лета."
+  },
+  {
+    "id": "bukhara_6",
+    "name": "Бухара-6 (UZ)",
+    "origin": "Uzbekistan",
+    "max_yield": 43.0,
+    "gdd_needed": 1900,
+    "days_to_mature": 125,
+    "heat_tolerance": "high",
+    "salinity_tolerance": "medium",
+    "description": "Засухоустойчивый сорт от соседей. Стабильный."
+  },
+  {
+    "id": "sultan",
+    "name": "Султан (UZ)",
+    "origin": "Uzbekistan",
+    "max_yield": 46.0,
+    "gdd_needed": 2050,
+    "days_to_mature": 130,
+    "heat_tolerance": "high",
+    "salinity_tolerance": "medium",
+    "description": "Высокое качество волокна, любит жару."
+  },
+  {
+    "id": "may_455",
+    "name": "May-455 (TR)",
+    "origin": "Turkey",
+    "max_yield": 52.0,
+    "gdd_needed": 2150,
+    "days_to_mature": 135,
+    "heat_tolerance": "medium",
+    "salinity_tolerance": "low",
+    "description": "Турецкая селекция. Премиум качество, но капризный."
+  },
+  {
+    "id": "flash",
+    "name": "Flash (TR)",
+    "origin": "Turkey",
+    "max_yield": 50.0,
+    "gdd_needed": 2100,
+    "days_to_mature": 128,
+    "heat_tolerance": "medium",
+    "salinity_tolerance": "low",
+    "description": "Быстрый старт, хорошая всхожесть."
+  },
+  {
+    "id": "dp_393",
+    "name": "DP-393 (US Proxy)",
+    "origin": "USA",
+    "max_yield": 58.0,
+    "gdd_needed": 2250,
+    "days_to_mature": 138,
+    "heat_tolerance": "medium",
+    "salinity_tolerance": "low",
+    "description": "Американский тип. Высокий потенциал, но не для солончаков."
+  },
+  {
+    "id": "fibermax_gen",
+    "name": "FiberMax (Generic)",
+    "origin": "Global",
+    "max_yield": 56.0,
+    "gdd_needed": 2200,
+    "days_to_mature": 136,
+    "heat_tolerance": "medium",
+    "salinity_tolerance": "medium",
+    "description": "Универсальный мировой гибрид."
+  }
+]

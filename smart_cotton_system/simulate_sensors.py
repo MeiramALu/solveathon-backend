@@ -1,84 +1,100 @@
+import os
+import django
 import pandas as pd
-import requests
 import time
-import json
+import sys
 
-# --- НАСТРОЙКИ ---
-BASE_URL = "http://127.0.0.1:8000"
-LOGIN_URL = f"{BASE_URL}/auth/token/login/"
-API_URL = f"{BASE_URL}/api/factory/machines/telemetry/"
-EXCEL_FILE = "telemetry_new.xlsx"  # Имя вашего файла
+# Настройка Django
+sys.path.append(os.getcwd())
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
 
-# Введите логин и пароль, которые вы создали (admin)
-USERNAME = "admin"
-PASSWORD = "2031"  # Ваш пароль
-
-
-def get_auth_token():
-    """Получаем токен доступа, чтобы система нас пустила"""
-    try:
-        response = requests.post(LOGIN_URL, json={"username": USERNAME, "password": PASSWORD})
-        if response.status_code == 200:
-            token = response.json().get("auth_token")
-            print(f"🔑 Успешный вход! Токен: {token[:10]}...")
-            return token
-        else:
-            print(f"❌ Ошибка входа: {response.text}")
-            return None
-    except Exception as e:
-        print(f"❌ Сервер недоступен: {e}")
-        return None
+from factory.models import Machine, MaintenanceLog
+from factory.services import analyze_machine_health
 
 
 def run_simulation():
-    # 1. Получаем токен
-    token = get_auth_token()
-    if not token:
+    excel_file = 'telemetry.xlsx'
+
+    if not os.path.exists(excel_file):
+        print(f"❌ Файл {excel_file} не найден.")
         return
 
-    headers = {"Authorization": f"Token {token}"}
-
-    # 2. Читаем Excel
+    print(f"📂 Читаем данные из {excel_file}...")
     try:
-        df = pd.read_excel(EXCEL_FILE)
-        print(f"📂 Загружено {len(df)} строк данных.")
+        df = pd.read_excel(excel_file)
+        # Чистим названия колонок (убираем пробелы, делаем маленькими)
+        df.columns = df.columns.str.strip().str.lower()
     except Exception as e:
-        print(f"❌ Не могу найти файл {EXCEL_FILE}. Положите его в папку проекта.")
+        print(f"❌ Ошибка чтения Excel: {e}")
         return
 
-    # 3. Отправляем данные построчно
-    print("🚀 Начинаем симуляцию датчиков...\n")
+    print("🚀 Записываем данные в базу...")
 
     for index, row in df.iterrows():
-        # Формируем JSON, который ждет наш API
-        payload = {
-            "machine_id": row.get("machine_id", "GIN-01"),  # Если в excel нет ID, будет GIN-01
-            "temperature": row["temperature"],
-            "vibration": row["vibration"],
-            "motor_load": row["motor_load"],
-            "humidity": row["humidity"]
-        }
-
         try:
-            response = requests.post(API_URL, json=payload, headers=headers)
+            # 1. Читаем данные
+            m_name = str(row['machine_id']).strip()
 
-            if response.status_code == 200:
-                data = response.json()
-                risk = data.get('risk', 0)
-                status_icon = "🟢" if risk < 30 else "🔴"
-                print(
-                    f"[{index + 1}] {status_icon} Отправлено: Temp={payload['temperature']}, Vib={payload['vibration']} -> Риск: {risk}%")
+            temp = float(row['temperature'])
+            vib = float(row['vibration'])
+
+            # Нагрузка (может называться load или motor_load)
+            if 'motor_load' in row:
+                load = float(row['motor_load'])
+            elif 'load' in row:
+                load = float(row['load'])
             else:
-                print(f"[{index + 1}] ❌ Ошибка API: {response.text}")
+                load = 0.0
 
+            # Влажность (если есть в excel)
+            if 'humidity' in row:
+                hum = float(row['humidity'])
+            else:
+                hum = 0.0
+
+            # 2. Ищем станок
+            machine = Machine.objects.get(name=m_name)
+
+            # 3. Обновляем показатели (Текущее состояние)
+            machine.last_temp = temp
+            machine.last_vibration = vib
+            machine.last_motor_load = load
+            machine.last_humidity = hum
+
+            # 4. Анализируем (AI)
+            prob, desc = analyze_machine_health(machine, temp, vib, load)
+
+            # Меняем статус
+            if prob > 50:
+                machine.status = 'WARNING'
+            else:
+                machine.status = 'ONLINE'
+
+            machine.save()
+
+            # 5. Пишем лог (ИСТОРИЯ ДЛЯ ГРАФИКОВ)
+            MaintenanceLog.objects.create(
+                machine=machine,
+                is_prediction=True,
+                probability_failure=prob,
+                description=f"Simulated: {desc}",  # <--- ЗАПЯТАЯ ВАЖНА
+
+                # Записываем цифры, чтобы потом строить графики
+                temperature=temp,
+                vibration=vib
+            )
+
+            print(f"✅ {m_name}: T={temp}, Vib={vib}, Risk={prob}%")
+            time.sleep(0.1)
+
+        except Machine.DoesNotExist:
+            print(f"⚠️ Станок '{m_name}' не найден в базе.")
         except Exception as e:
-            print(f"Ошибка соединения: {e}")
+            print(f"❌ Ошибка в строке {index}: {e}")
 
-        # Небольшая пауза, чтобы видеть процесс (0.1 секунды)
-        time.sleep(0.1)
-
-    print("\n✅ Симуляция завершена!")
+    print("\n🏁 Готово! Данные в базе.")
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     run_simulation()

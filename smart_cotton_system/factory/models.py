@@ -18,7 +18,7 @@ class CottonBatch(models.Model):
     region = models.CharField(max_length=100, default="South", verbose_name="Регион выращивания")
     seed_variety = models.CharField(max_length=100, null=True, blank=True, verbose_name="Сорт семян")
     weight_kg = models.FloatField(default=0, verbose_name="Вес партии (кг)")
-
+    seed_recommendations = models.JSONField(null=True, blank=True, verbose_name="Топ-3 Семена (AI)")
     # Файлы
     cotton_image = models.ImageField(upload_to='cotton_images/', null=True, blank=True, verbose_name="Фото образца")
     hvi_file = models.FileField(upload_to='hvi_docs/', null=True, blank=True, verbose_name="HVI файл")
@@ -84,7 +84,8 @@ class MaintenanceLog(models.Model):
     machine = models.ForeignKey(Machine, on_delete=models.CASCADE, verbose_name="Станок")
     timestamp = models.DateTimeField(auto_now_add=True)
     description = models.TextField(verbose_name="Описание проблемы")
-
+    temperature = models.FloatField(default=0, verbose_name="Температура (°C)")
+    vibration = models.FloatField(default=0, verbose_name="Вибрация")
     # Результат AI
     is_prediction = models.BooleanField(default=False, verbose_name="Это прогноз AI?")
     probability_failure = models.FloatField(default=0, verbose_name="Вероятность поломки (%)")
