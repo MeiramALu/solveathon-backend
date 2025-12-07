@@ -118,8 +118,14 @@ export default function SafetyMonitoringPage() {
     };
 
     // Trigger simulation
-    const handleSimulate = async (simType: 'panic' | 'toxic' | 'fall') => {
+    const handleSimulate = async (simType: 'panic' | 'toxic' | 'fall' | 'reset') => {
         if (!selectedWorker) return;
+
+        if (simType === 'reset') {
+            // Optionally handle reset logic here, or just refresh data
+            fetchWorkers();
+            return;
+        }
 
         try {
             await fetch(`${API_BASE}/api/safety/workers/simulate/`, {
