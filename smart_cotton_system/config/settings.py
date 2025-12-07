@@ -17,7 +17,7 @@ SECRET_KEY = 'django-insecure-4nbph2f5s#ryat_9kj715_%zv!a081^m6&7fs*8h-aq2$ocyr!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -158,3 +158,7 @@ REST_FRAMEWORK = {
 }
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://cody-fanglike-jean.ngrok-free.dev',
+]
