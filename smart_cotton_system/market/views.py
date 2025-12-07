@@ -13,7 +13,6 @@ class MarketPriceViewSet(viewsets.ModelViewSet):
     """
     queryset = MarketPrice.objects.all().order_by('-date')
     serializer_class = MarketPriceSerializer
-    permission_classes = [IsAuthenticated]
 
     @action(detail=False, methods=['get'])
     def forecast(self, request):

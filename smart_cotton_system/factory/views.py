@@ -27,7 +27,6 @@ from .services import (
 class CottonBatchViewSet(viewsets.ModelViewSet):
     queryset = CottonBatch.objects.all().order_by('-created_at')
     serializer_class = CottonBatchSerializer
-    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         serializer.save()
@@ -84,7 +83,6 @@ class CottonBatchViewSet(viewsets.ModelViewSet):
 class MachineViewSet(viewsets.ModelViewSet):
     queryset = Machine.objects.all()
     serializer_class = MachineSerializer
-    permission_classes = [IsAuthenticated]
 
     # --- API: Данные для Графиков (GET) ---
     @action(detail=True, methods=['get'])
@@ -163,7 +161,6 @@ class MachineViewSet(viewsets.ModelViewSet):
 class MaintenanceLogViewSet(viewsets.ModelViewSet):
     queryset = MaintenanceLog.objects.all().order_by('-timestamp')
     serializer_class = MaintenanceLogSerializer
-    permission_classes = [IsAuthenticated]
 
 
 # ==========================================

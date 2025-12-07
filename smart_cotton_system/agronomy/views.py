@@ -11,7 +11,6 @@ class SeedVarietyViewSet(viewsets.ModelViewSet):
     """
     queryset = SeedVariety.objects.all()
     serializer_class = SeedVarietySerializer
-    permission_classes = [IsAuthenticated]
 
 
 class FieldViewSet(viewsets.ModelViewSet):
@@ -19,7 +18,6 @@ class FieldViewSet(viewsets.ModelViewSet):
     Поля. Фильтрация: Фермер видит только свои поля.
     """
     serializer_class = FieldSerializer
-    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -40,7 +38,6 @@ class SensorLogViewSet(viewsets.ModelViewSet):
     Здесь тоже добавляем фильтрацию, чтобы фермер видел логи ТОЛЬКО со своих полей.
     """
     serializer_class = SensorLogSerializer
-    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         # Берем базовый запрос
