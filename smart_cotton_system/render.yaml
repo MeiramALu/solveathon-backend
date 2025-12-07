@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: smart-cotton-backend
+    env: python
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate
+    startCommand: gunicorn config.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: False
+      - key: ALLOWED_HOSTS
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smart-cotton-db
+          property: connectionString
+      - key: ROBOFLOW_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: EXTERNAL_ML_URL
+        sync: false
+      - key: EXTERNAL_ML_KEY
+        sync: false
+
+databases:
+  - name: smart-cotton-db
+    plan: free
+    databaseName: smart_cotton
+    user: smart_cotton_user
