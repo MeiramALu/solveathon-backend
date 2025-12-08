@@ -115,7 +115,7 @@ function HVILabTab() {
             step="0.1"
             value={formData.micronaire}
             onChange={(e) => handleChange('micronaire', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 text-slate-700 focus:ring-green-500"
           />
         </div>
 
@@ -126,7 +126,7 @@ function HVILabTab() {
             step="0.1"
             value={formData.strength}
             onChange={(e) => handleChange('strength', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 text-slate-700 focus:ring-green-500"
           />
         </div>
 
@@ -137,7 +137,7 @@ function HVILabTab() {
             step="0.01"
             value={formData.length}
             onChange={(e) => handleChange('length', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 text-slate-700 focus:ring-green-500"
           />
         </div>
 
@@ -148,7 +148,7 @@ function HVILabTab() {
             step="0.1"
             value={formData.uniformity}
             onChange={(e) => handleChange('uniformity', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 text-slate-700 focus:ring-green-500"
           />
         </div>
 
@@ -160,7 +160,7 @@ function HVILabTab() {
             max="7"
             value={formData.trash_grade}
             onChange={(e) => handleChange('trash_grade', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 text-slate-700 focus:ring-green-500"
           />
         </div>
 
@@ -170,7 +170,7 @@ function HVILabTab() {
             type="number"
             value={formData.trash_cnt}
             onChange={(e) => handleChange('trash_cnt', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 text-slate-700 focus:ring-green-500"
           />
         </div>
 
@@ -181,7 +181,7 @@ function HVILabTab() {
             step="0.1"
             value={formData.trash_area}
             onChange={(e) => handleChange('trash_area', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 text-slate-700 focus:ring-green-500"
           />
         </div>
 
@@ -192,7 +192,7 @@ function HVILabTab() {
             step="0.1"
             value={formData.sfi}
             onChange={(e) => handleChange('sfi', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 text-slate-700 focus:ring-green-500"
           />
         </div>
 
@@ -202,7 +202,7 @@ function HVILabTab() {
             type="number"
             value={formData.sci}
             onChange={(e) => handleChange('sci', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 text-slate-700 focus:ring-green-500"
           />
         </div>
 
@@ -211,7 +211,7 @@ function HVILabTab() {
           <select
             value={formData.color_grade}
             onChange={(e) => handleChange('color_grade', e.target.value)}
-            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+            className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 text-slate-700 focus:ring-green-500"
           >
             <option value="11-1">11-1</option>
             <option value="21-1">21-1</option>
@@ -227,7 +227,7 @@ function HVILabTab() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:bg-slate-400"
+            className="w-full bg-green-600 text-white py-3 rounded-lg font-medium hover:bg-green-700 text-slate-700 transition-colors flex items-center justify-center gap-2 disabled:bg-slate-400"
           >
             {loading ? (
               <>

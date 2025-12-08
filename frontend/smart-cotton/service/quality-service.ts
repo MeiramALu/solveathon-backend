@@ -63,7 +63,7 @@ class QualityService {
 	 */
 	async predictQuality(data: HVIData): Promise<HVIPredictionResponse> {
 		const response = await axios.post(
-			`${API_BASE_URL}/factory/batches/predict-quality/`,
+			`${API_BASE_URL}/api/factory/batches/predict-quality/`,
 			data
 		);
 		return response.data;
@@ -77,7 +77,7 @@ class QualityService {
 		formData.append("image", imageFile);
 
 		const response = await axios.post(
-			`${API_BASE_URL}/factory/batches/analyze-image/`,
+			`${API_BASE_URL}/api/factory/batches/analyze-image/`,
 			formData,
 			{
 				headers: {
@@ -93,7 +93,7 @@ class QualityService {
 	 */
 	async recommendSeeds(location: string): Promise<SeedRecommendationResponse> {
 		const response = await axios.post(
-			`${API_BASE_URL}/agronomy/seeds/recommend/`,
+			`${API_BASE_URL}/api/agronomy/seeds/recommend/`,
 			{ location }
 		);
 		return response.data;
@@ -104,7 +104,7 @@ class QualityService {
 	 */
 	async getAvailableLocations(): Promise<LocationsResponse> {
 		const response = await axios.get(
-			`${API_BASE_URL}/agronomy/seeds/available-locations/`
+			`${API_BASE_URL}/api/agronomy/seeds/available-locations/`
 		);
 		return response.data;
 	}
