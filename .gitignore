@@ -35,11 +35,6 @@ static/
 *.pkl
 *.joblib
 *.onnx
-# Keep specific project models
-!ml_models/cotton_model.keras
-!models/cotton_model.keras
-!smart_cotton_system/ml_models/cotton_model.keras
-!smart_cotton_system/models/cotton_model.keras
 
 # Data files (large datasets)
 *.csv

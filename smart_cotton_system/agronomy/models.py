@@ -13,16 +13,6 @@ class SeedVariety(models.Model):
         return self.name
 
 
-class SeedVariety(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-    recommended_soil = models.CharField(max_length=100)
-    expected_yield = models.FloatField(help_text="Ожидаемый урожай ц/га")
-
-    def __str__(self):
-        return self.name
-
-
 class Field(models.Model):
     name = models.CharField(max_length=100, verbose_name="Название поля")
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
@@ -60,28 +50,28 @@ class SensorLog(models.Model):
 
     def __str__(self):
         return f"{self.field.name} | {self.timestamp.strftime('%H:%M')} | {self.soil_moisture}%"
-    
+
 class SensorReading(models.Model):
     """Extended sensor readings for water management"""
     field = models.ForeignKey(Field, on_delete=models.CASCADE, related_name='water_readings')
     date = models.DateField()
     location_x = models.FloatField(db_index=True)
     location_y = models.FloatField(db_index=True)
-    
+
     # Sensor data
     soil_humidity = models.FloatField(help_text="Soil humidity percentage")
     soil_temperature = models.FloatField(help_text="Soil temperature in Celsius")
-    
+
     # Weather data
     rain = models.FloatField(default=0, help_text="Daily rainfall in mm")
     daily_mean_temperature = models.FloatField(help_text="Air temperature in Celsius")
-    
+
     # Management data
     irrigation_amount = models.FloatField(default=0, help_text="Irrigation in m3/mu")
     days_since_irrigation = models.IntegerField(default=-1)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         unique_together = ['field', 'date', 'location_x', 'location_y']
         ordering = ['-date']
@@ -89,7 +79,7 @@ class SensorReading(models.Model):
             models.Index(fields=['field', 'date']),
             models.Index(fields=['location_x', 'location_y']),
         ]
-    
+
     def __str__(self):
         return f"Reading for {self.field.name} on {self.date}"
 
@@ -100,11 +90,11 @@ class IrrigationPrediction(models.Model):
     date = models.DateField(db_index=True)
     location_x = models.FloatField()
     location_y = models.FloatField()
-    
+
     # Predictions
     predicted_humidity = models.FloatField(help_text="Predicted soil humidity for tomorrow")
     current_humidity = models.FloatField(help_text="Current soil humidity")
-    
+
     # Risk assessment
     dry_risk = models.BooleanField(default=False, help_text="Is there a drought risk?")
     risk_level = models.CharField(
@@ -112,7 +102,7 @@ class IrrigationPrediction(models.Model):
         choices=[('low', 'Low'), ('medium', 'Medium'), ('high', 'High')],
         default='low'
     )
-    
+
     # Recommendations
     irrigation_action = models.CharField(
         max_length=20,
@@ -120,18 +110,18 @@ class IrrigationPrediction(models.Model):
         default='SKIP'
     )
     recommended_irrigation = models.FloatField(help_text="Recommended irrigation amount in m3/mu")
-    
+
     # Metadata
     is_future = models.BooleanField(default=False, help_text="Is this a future prediction?")
     confidence_score = models.FloatField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         ordering = ['-date']
         indexes = [
             models.Index(fields=['field', 'date', 'is_future']),
         ]
-    
+
     def __str__(self):
         return f"Prediction for {self.field.name} on {self.date}"
 
@@ -141,7 +131,7 @@ class IrrigationEvent(models.Model):
     field = models.ForeignKey(Field, on_delete=models.CASCADE, related_name='irrigation_events')
     date = models.DateField()
     amount = models.FloatField(help_text="Amount in m3/mu")
-    
+
     # Link to prediction if this was AI-recommended
     prediction = models.ForeignKey(
         IrrigationPrediction,
@@ -150,7 +140,7 @@ class IrrigationEvent(models.Model):
         blank=True,
         related_name='actual_events'
     )
-    
+
     notes = models.TextField(blank=True)
     # Use settings.AUTH_USER_MODEL which references the correct user model
     created_by = models.ForeignKey(
@@ -160,10 +150,10 @@ class IrrigationEvent(models.Model):
         blank=True
     )
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         ordering = ['-date']
-    
+
     def __str__(self):
         return f"Irrigation on {self.date}: {self.amount} m³/mu"
         return f"{self.field.name} | {self.timestamp.strftime('%H:%M')} | Влага: {self.soil_moisture}% | Риск: {self.drought_risk}"
