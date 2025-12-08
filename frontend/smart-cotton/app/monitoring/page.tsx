@@ -118,7 +118,7 @@ export default function SafetyMonitoringPage() {
     };
 
     // Trigger simulation
-    const handleSimulate = async (simType: SimulationType) => {
+    const handleSimulate = async (simType: SimulationType): Promise<void> => {
         if (!selectedWorker) return;
 
         if (simType === 'reset') {
