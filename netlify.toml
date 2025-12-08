@@ -1,7 +1,7 @@
 [build]
   base = "frontend/smart-cotton"
-  command = "npm run build"
-  publish = "frontend/smart-cotton/.next"
+  command = "npm install && npm run build"
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "20"
